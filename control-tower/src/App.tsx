@@ -90,19 +90,6 @@ export const App: React.FC = () => {
   // Direct short voice briefing trigger
   const handleDirectVoiceBriefing = () => {
     setIsVoiceOpen(true);
-    const isAtRisk = selectedShipment.status === 'AT_RISK';
-    const delta = (selectedShipment.currentTemp - selectedShipment.safeRange.max).toFixed(1);
-
-    const briefing = isAtRisk
-      ? `Alert for shipment ${selectedShipment.id}. ${selectedShipment.product} is experiencing an active temperature excursion at ${selectedShipment.currentTemp} degrees Celsius, which is ${delta} degrees above the maximum safe limit of ${selectedShipment.safeRange.max} degrees. The excursion has been ongoing for ${selectedShipment.excursionDurationMinutes || 38} minutes near ${selectedShipment.route.currentGeo.split('(')[0]}. Arctic TransLog alternative standby fleet is available 14 kilometers away, and Cold Storage 50 is available 18 kilometers away for emergency diversion.`
-      : `Shipment ${selectedShipment.id} is operating safely at ${selectedShipment.currentTemp} degrees Celsius, within the safe range of ${selectedShipment.safeRange.min} to ${selectedShipment.safeRange.max} degrees.`;
-
-    if ('speechSynthesis' in window) {
-      window.speechSynthesis.cancel();
-      const u = new SpeechSynthesisUtterance(briefing);
-      u.rate = 1.05;
-      window.speechSynthesis.speak(u);
-    }
   };
 
   // FR-4: AI Agent recommendation request
@@ -423,6 +410,7 @@ export const App: React.FC = () => {
         alternativeFleets={alternativeFleets}
         isOpen={isVoiceOpen}
         onClose={() => setIsVoiceOpen(false)}
+        theme={theme}
       />
     </div>
   );
