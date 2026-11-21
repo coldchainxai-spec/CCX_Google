@@ -12,7 +12,7 @@ import { AlternativeFleets } from './components/AlternativeFleets';
 import { AIOperationsAgent } from './components/AIOperationsAgent';
 import { VoiceAssistant } from './components/VoiceAssistant';
 import { Timeline } from './components/Timeline';
-import { Warehouse, Truck, Map, Volume2 } from 'lucide-react';
+import { Warehouse, Truck, Map, Volume2, Sparkles } from 'lucide-react';
 
 export const App: React.FC = () => {
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
@@ -278,6 +278,25 @@ export const App: React.FC = () => {
 
   return (
     <div className="app-container">
+      {/* Top One-Line Value Proposition Banner */}
+      <div 
+        style={{
+          background: 'linear-gradient(90deg, rgba(2, 132, 199, 0.12) 0%, rgba(6, 182, 212, 0.20) 50%, rgba(2, 132, 199, 0.12) 100%)',
+          borderBottom: '1px solid rgba(6, 182, 212, 0.35)',
+          padding: '0.55rem 1.25rem',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '0.65rem',
+          textAlign: 'center',
+        }}
+      >
+        <Sparkles size={16} color="var(--brand-cyan)" style={{ flexShrink: 0 }} />
+        <span style={{ fontSize: '0.825rem', color: 'var(--text-main)', lineHeight: 1.45 }}>
+          <strong style={{ color: 'var(--brand-cyan)', fontWeight: 700 }}>One-line value proposition:</strong> "ColdChainX transforms India's fragmented cold-chain ecosystem into an intelligent, connected and AI-powered marketplace, simplifying storage booking, reefer transportation and end-to-end shipment management."
+        </span>
+      </div>
+
       <Header
         theme={theme}
         onToggleTheme={toggleTheme}
