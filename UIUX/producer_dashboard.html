@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ColdChainX — Producer Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{--brand-teal:#0F766E;--brand-blue:#00329B;--brand-ice:#38BDF8;--bg:#F0F5FF;--white:#fff;--border:#E2E8F0;--text:#0F172A;--muted:#64748B;--light:#F8FAFC;--green:#16A34A;--amber:#D97706;--red:#DC2626;--orange:#EA580C;}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);display:flex;min-height:100vh;}
+
+/* SIDEBAR */
+.sidebar{width:230px;background:#00329B;min-height:100vh;display:flex;flex-direction:column;flex-shrink:0;position:sticky;top:0;height:100vh;overflow-y:auto;}
+.sb-top{padding:18px 16px 16px;border-bottom:1px solid rgba(255,255,255,0.08);}
+.sb-brand{display:flex;align-items:center;gap:9px;}
+.sb-logo{width:32px;height:32px;background:rgba(255,255,255,0.15);border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.sb-name{font-family:'Sora',sans-serif;font-size:15px;font-weight:800;color:#fff;}
+.sb-name span{color:#38BDF8;}
+.sb-user{margin-top:12px;display:flex;align-items:center;gap:9px;}
+.user-av{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#0F766E,#38BDF8);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0;}
+.user-nm{font-size:12px;font-weight:600;color:#fff;}
+.user-rl{font-size:10px;color:rgba(255,255,255,0.5);}
+.user-badge{font-size:9px;background:#22C55E;color:#fff;padding:1px 6px;border-radius:3px;font-weight:600;}
+
+.sb-nav{padding:10px 8px;flex:1;}
+.nav-grp{font-size:9px;color:rgba(255,255,255,0.3);font-weight:700;letter-spacing:0.8px;text-transform:uppercase;padding:10px 8px 4px;}
+.nav-item{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:8px;font-size:12px;color:rgba(255,255,255,0.6);cursor:pointer;transition:all .15s;text-decoration:none;border-left:2px solid transparent;margin-bottom:1px;}
+.nav-item:hover{background:rgba(255,255,255,0.07);color:#fff;}
+.nav-item.active{background:rgba(255,255,255,0.14);color:#fff;border-left-color:#38BDF8;}
+.nav-item .ni{font-size:14px;width:16px;text-align:center;flex-shrink:0;}
+.nav-badge{margin-left:auto;background:#EF4444;color:#fff;font-size:9px;font-weight:700;padding:1px 6px;border-radius:999px;}
+.nav-badge.amber{background:#F59E0B;}
+
+.sb-bottom{padding:12px 16px;border-top:1px solid rgba(255,255,255,0.08);}
+.quick-book{width:100%;padding:10px;background:linear-gradient(135deg,#0F766E,#38BDF8);border:none;border-radius:8px;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;display:flex;align-items:center;justify-content:center;gap:6px;}
+
+/* MAIN */
+.main{flex:1;overflow-x:hidden;}
+.topbar{background:#fff;border-bottom:1px solid var(--border);padding:0 28px;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
+.topbar-left .page-title{font-family:'Sora',sans-serif;font-size:15px;font-weight:700;color:var(--text);}
+.topbar-left .page-sub{font-size:11px;color:var(--muted);}
+.topbar-right{display:flex;align-items:center;gap:12px;}
+.tb-search{display:flex;align-items:center;gap:8px;background:#F8FAFC;border:1px solid var(--border);border-radius:8px;padding:7px 12px;font-size:12px;color:var(--muted);cursor:text;width:200px;}
+.tb-icon{width:34px;height:34px;border-radius:8px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;font-size:14px;}
+.tb-dot{width:8px;height:8px;background:#EF4444;border-radius:50%;position:absolute;top:6px;right:7px;border:1px solid #fff;}
+
+/* CONTENT */
+.content{padding:24px 28px;}
+
+/* WELCOME BANNER */
+.welcome-banner{background:linear-gradient(135deg,#0F766E,#00329B);border-radius:14px;padding:20px 24px;margin-bottom:22px;display:flex;align-items:center;justify-content:space-between;overflow:hidden;position:relative;}
+.welcome-banner::before{content:'❄';position:absolute;right:120px;top:-10px;font-size:80px;opacity:.07;}
+.wb-text .hi{font-size:11px;color:rgba(255,255,255,0.65);margin-bottom:3px;}
+.wb-text .name{font-family:'Sora',sans-serif;font-size:20px;font-weight:800;color:#fff;}
+.wb-text .sub{font-size:12px;color:rgba(255,255,255,0.65);margin-top:4px;}
+.wb-actions{display:flex;gap:10px;}
+.wb-btn{padding:9px 18px;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;transition:all .15s;text-decoration:none;display:inline-flex;align-items:center;gap:6px;}
+.wb-btn-primary{background:#fff;color:var(--brand-blue);border:none;}
+.wb-btn-outline{background:rgba(255,255,255,0.12);color:#fff;border:1px solid rgba(255,255,255,0.25);}
+
+/* KPI GRID */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px;}
+.kpi{background:#fff;border-radius:12px;border:1px solid var(--border);padding:16px;box-shadow:0 1px 6px rgba(0,0,0,0.04);}
+.kpi-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.kpi-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;}
+.ki-teal{background:#CCFBF1;}
+.ki-blue{background:#DBEAFE;}
+.ki-green{background:#DCFCE7;}
+.ki-amber{background:#FEF3C7;}
+.ki-red{background:#FEE2E2;}
+.ki-purple{background:#EDE9FE;}
+.kpi-trend{font-size:10px;padding:2px 7px;border-radius:4px;font-weight:600;}
+.kpi-trend.up{background:#DCFCE7;color:#15803D;}
+.kpi-trend.dn{background:#FEE2E2;color:#991B1B;}
+.kpi-trend.neu{background:#F1F5F9;color:#64748B;}
+.kpi-val{font-family:'Sora',sans-serif;font-size:22px;font-weight:800;color:var(--text);}
+.kpi-label{font-size:11px;color:var(--muted);margin-top:2px;}
+.kpi-sub{font-size:10px;color:#94A3B8;margin-top:4px;}
+
+/* MID GRID */
+.mid-grid{display:grid;grid-template-columns:1fr 360px;gap:18px;margin-bottom:22px;}
+
+/* CARD */
+.card{background:#fff;border-radius:14px;border:1px solid var(--border);box-shadow:0 1px 8px rgba(0,0,0,0.04);}
+.card-header{padding:15px 20px;border-bottom:1px solid #F8FAFC;display:flex;align-items:center;justify-content:space-between;}
+.ch-left{display:flex;align-items:center;gap:10px;}
+.ch-icon{width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.ch-title{font-size:13px;font-weight:700;color:var(--text);}
+.ch-sub{font-size:10px;color:var(--muted);margin-top:1px;}
+.ch-link{font-size:12px;color:var(--brand-teal);font-weight:600;cursor:pointer;text-decoration:none;}
+
+/* BOOKING ITEMS */
+.booking-item{display:flex;align-items:center;gap:12px;padding:12px 20px;border-bottom:1px solid #F8FAFC;transition:background .15s;cursor:pointer;}
+.booking-item:last-child{border-bottom:none;}
+.booking-item:hover{background:#FAFBFF;}
+.bi-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.bi-info{flex:1;}
+.bi-name{font-size:13px;font-weight:600;color:var(--text);}
+.bi-sub{font-size:11px;color:var(--muted);margin-top:2px;}
+.bi-meta{font-size:11px;color:var(--muted);}
+.bi-right{text-align:right;}
+.bi-amount{font-size:13px;font-weight:700;color:var(--text);}
+.bi-status{font-size:10px;font-weight:600;padding:2px 8px;border-radius:4px;margin-top:3px;display:inline-block;}
+.bs-active{background:#DCFCE7;color:#15803D;}
+.bs-pending{background:#FEF3C7;color:#92400E;}
+.bs-transit{background:#DBEAFE;color:#1E40AF;}
+.bs-completed{background:#F1F5F9;color:#475569;}
+
+/* BID ITEMS */
+.bid-item{padding:14px 20px;border-bottom:1px solid #F8FAFC;}
+.bid-item:last-child{border-bottom:none;}
+.bid-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
+.bid-id{font-size:10px;color:#94A3B8;}
+.bid-timer{font-size:10px;background:#FEF3C7;color:#92400E;padding:2px 7px;border-radius:4px;font-weight:600;}
+.bid-company{font-size:13px;font-weight:700;color:var(--text);}
+.bid-type{font-size:10px;color:#fff;padding:2px 7px;border-radius:4px;font-weight:600;margin-left:6px;}
+.bt-storage{background:var(--brand-teal);}
+.bt-transport{background:#7C3AED;}
+.bid-details{display:flex;gap:12px;margin-top:5px;font-size:11px;color:var(--muted);}
+.bid-actions{display:flex;gap:7px;margin-top:10px;}
+.ba-btn{flex:1;padding:7px;border-radius:7px;font-size:11px;font-weight:600;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;text-align:center;}
+.ba-compare{background:#EFF6FF;color:var(--brand-blue);border:1px solid #BFDBFE;}
+.ba-book{background:var(--brand-blue);color:#fff;border:none;}
+
+/* LIVE TRACKING */
+.track-item{padding:12px 20px;border-bottom:1px solid #F8FAFC;}
+.track-item:last-child{border-bottom:none;}
+.track-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.track-id{font-size:11px;font-weight:700;color:var(--text);}
+.track-status{font-size:10px;font-weight:600;padding:3px 9px;border-radius:999px;}
+.ts-in-transit{background:#DBEAFE;color:#1E40AF;}
+.ts-storage{background:#DCFCE7;color:#15803D;}
+.track-route{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted);margin-bottom:8px;}
+.track-dot{width:6px;height:6px;border-radius:50%;}
+.track-progress-bar{height:4px;background:#F1F5F9;border-radius:999px;overflow:hidden;margin-bottom:4px;}
+.track-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--brand-teal),var(--brand-ice));}
+.track-meta{display:flex;justify-content:space-between;font-size:10px;color:#94A3B8;}
+
+/* ALERTS */
+.alert-item{display:flex;gap:10px;padding:11px 20px;border-bottom:1px solid #F8FAFC;align-items:flex-start;}
+.alert-item:last-child{border-bottom:none;}
+.alert-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:3px;}
+.ad-green{background:#22C55E;}
+.ad-amber{background:#F59E0B;}
+.ad-red{background:#EF4444;}
+.ad-blue{background:#3B82F6;}
+.alert-text{font-size:12px;color:var(--text);line-height:1.4;}
+.alert-time{font-size:10px;color:#94A3B8;margin-top:2px;}
+
+/* TEMP CARDS */
+.temp-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:22px;}
+.temp-card{background:#fff;border-radius:12px;border:1px solid var(--border);padding:14px;text-align:center;}
+.temp-val{font-family:'Sora',sans-serif;font-size:20px;font-weight:800;margin-bottom:3px;}
+.temp-name{font-size:11px;color:var(--muted);}
+.temp-status{font-size:9px;font-weight:600;padding:2px 7px;border-radius:3px;margin-top:6px;display:inline-block;}
+
+/* BOTTOM GRID */
+.bottom-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;}
+
+/* ANALYTICS BARS */
+.analytic-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #F8FAFC;}
+.analytic-row:last-child{border-bottom:none;}
+.an-label{font-size:11px;color:var(--muted);width:100px;flex-shrink:0;}
+.an-bar{flex:1;height:7px;background:#F1F5F9;border-radius:999px;overflow:hidden;}
+.an-fill{height:100%;border-radius:999px;}
+.an-val{font-size:11px;font-weight:600;color:var(--text);width:36px;text-align:right;flex-shrink:0;}
+
+/* QUICK ACTIONS */
+.quick-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:16px 20px;}
+.qa{padding:12px;border-radius:10px;border:1px solid var(--border);cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:10px;text-decoration:none;}
+.qa:hover{border-color:var(--brand-blue);background:#EFF6FF;}
+.qa-icon{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.qa-label{font-size:12px;font-weight:700;color:var(--text);}
+.qa-desc{font-size:10px;color:var(--muted);margin-top:1px;}
+
+@media(max-width:1100px){.kpi-grid{grid-template-columns:repeat(2,1fr);}.mid-grid{grid-template-columns:1fr;}.bottom-grid{grid-template-columns:1fr;}.temp-row{grid-template-columns:1fr 1fr;}}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="sb-top">
+    <div class="sb-brand">
+      <div class="sb-logo"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg></div>
+      <div class="sb-name">Cold<span>Chain</span>X</div>
+    </div>
+    <div class="sb-user">
+      <div class="user-av">RK</div>
+      <div>
+        <div class="user-nm">Rajan Kumar</div>
+        <div style="display:flex;align-items:center;gap:5px;margin-top:2px;"><div class="user-rl">Farmer / FPO</div><span class="user-badge">✓ Verified</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="sb-nav">
+    <div class="nav-grp">Main</div>
+    <a class="nav-item active" href="producer_dashboard.html"><span class="ni">📊</span> Dashboard</a>
+    <a class="nav-item" href="producer_booking.html"><span class="ni">⚡</span> Instant Book <span class="nav-badge">New</span></a>
+    <a class="nav-item" href="producer_bid.html"><span class="ni">⚖️</span> Bid & Compare <span class="nav-badge amber">4</span></a>
+    <div class="nav-grp">Manage</div>
+    <a class="nav-item" href="#"><span class="ni">📦</span> My Bookings</a>
+    <a class="nav-item" href="#"><span class="ni">📍</span> Live Tracking</a>
+    <a class="nav-item" href="producer_payment.html"><span class="ni">💳</span> Payments</a>
+    <a class="nav-item" href="#"><span class="ni">📋</span> RFQ History</a>
+    <div class="nav-grp">Account</div>
+    <a class="nav-item" href="#"><span class="ni">👤</span> My Profile</a>
+    <a class="nav-item" href="#"><span class="ni">🔔</span> Alerts <span class="nav-badge">3</span></a>
+    <a class="nav-item" href="#"><span class="ni">📈</span> Analytics</a>
+    <a class="nav-item" href="#"><span class="ni">⭐</span> My Ratings</a>
+    <a class="nav-item" href="#"><span class="ni">🎧</span> Support</a>
+  </div>
+  <div class="sb-bottom">
+    <button class="quick-book" onclick="window.location='producer_booking.html'">⚡ Instant Book Now</button>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="page-title">Producer Dashboard</div>
+      <div class="page-sub">Rajan Agro Farms · Navi Mumbai · Last updated 5 mins ago</div>
+    </div>
+    <div class="topbar-right">
+      <div class="tb-search">🔍 Search bookings, bids...</div>
+      <div class="tb-icon">🔔<div class="tb-dot"></div></div>
+      <div class="tb-icon">💬</div>
+      <div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--brand-teal),var(--brand-ice));display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;cursor:pointer;">RK</div>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- WELCOME BANNER -->
+    <div class="welcome-banner">
+      <div class="wb-text">
+        <div class="hi">Good morning 👋</div>
+        <div class="name">Rajan Kumar — Rajan Agro Farms</div>
+        <div class="sub">🌾 Farmer / FPO · Navi Mumbai · ✅ Verified Producer · 4 active orders this week</div>
+      </div>
+      <div class="wb-actions">
+        <a class="wb-btn wb-btn-primary" href="producer_booking.html">⚡ Instant Book</a>
+        <a class="wb-btn wb-btn-outline" href="producer_bid.html">⚖️ Raise RFQ</a>
+      </div>
+    </div>
+
+    <!-- KPI GRID -->
+    <div class="kpi-grid">
+      <div class="kpi">
+        <div class="kpi-top"><div class="kpi-icon ki-teal">📦</div><div class="kpi-trend up">↑ 12%</div></div>
+        <div class="kpi-val">7</div>
+        <div class="kpi-label">Active Bookings</div>
+        <div class="kpi-sub">3 in transit · 4 in storage</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-top"><div class="kpi-icon ki-green">✅</div><div class="kpi-trend up">+3</div></div>
+        <div class="kpi-val">24</div>
+        <div class="kpi-label">Completed This Month</div>
+        <div class="kpi-sub">98.2% SLA compliance</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-top"><div class="kpi-icon ki-blue">💰</div><div class="kpi-trend dn">↓ 3%</div></div>
+        <div class="kpi-val">₹4.2L</div>
+        <div class="kpi-label">Total Spend (Month)</div>
+        <div class="kpi-sub">₹1.1L pending payment</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-top"><div class="kpi-icon ki-amber">⚖️</div><div class="kpi-trend neu">Live</div></div>
+        <div class="kpi-val">4</div>
+        <div class="kpi-label">Open Bids / RFQs</div>
+        <div class="kpi-sub">12 bids received · 4 pending</div>
+      </div>
+    </div>
+
+    <!-- TEMP MONITORING -->
+    <div style="margin-bottom:8px;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;">Live Temperature Monitoring</div>
+    <div class="temp-row">
+      <div class="temp-card">
+        <div class="temp-val" style="color:#38BDF8;">-20°C</div>
+        <div class="temp-name">Shree Krishna CS · Chamber A</div>
+        <div class="temp-status" style="background:#EFF6FF;color:#1D4ED8;">❄ Frozen · Optimal</div>
+      </div>
+      <div class="temp-card">
+        <div class="temp-val" style="color:#22C55E;">3.5°C</div>
+        <div class="temp-name">Pune ColdHub · Chamber B</div>
+        <div class="temp-status" style="background:#DCFCE7;color:#15803D;">🌿 Chilled · Normal</div>
+      </div>
+      <div class="temp-card">
+        <div class="temp-val" style="color:#F59E0B;">19°C</div>
+        <div class="temp-name">Western Agri · Chamber C</div>
+        <div class="temp-status" style="background:#FEF3C7;color:#92400E;">☀ Ambient · OK</div>
+      </div>
+      <div class="temp-card">
+        <div class="temp-val" style="color:#EF4444;">-4°C</div>
+        <div class="temp-name">Nashik Cold · Unit D</div>
+        <div class="temp-status" style="background:#FEE2E2;color:#991B1B;">⚠ Alert · Drift</div>
+      </div>
+    </div>
+
+    <!-- MID GRID -->
+    <div class="mid-grid">
+      <!-- BOOKINGS -->
+      <div class="card">
+        <div class="card-header">
+          <div class="ch-left"><div class="ch-icon ki-blue">📦</div><div><div class="ch-title">Active Bookings</div><div class="ch-sub">Real-time status of all orders</div></div></div>
+          <a class="ch-link" href="#">View all →</a>
+        </div>
+        <div class="booking-item">
+          <div class="bi-icon ki-teal">🏭</div>
+          <div class="bi-info">
+            <div class="bi-name">Shree Krishna Cold Storage</div>
+            <div class="bi-sub">80 MT · Chilled · 30 days · Booking #BK-2041</div>
+          </div>
+          <div class="bi-right"><div class="bi-amount">₹1,08,000</div><div class="bi-status bs-active">Active</div></div>
+        </div>
+        <div class="booking-item">
+          <div class="bi-icon" style="background:#F3E8FF;">🚛</div>
+          <div class="bi-info">
+            <div class="bi-name">Kiran Reefer Transport</div>
+            <div class="bi-sub">3 MT · APMC Vashi → Pune · Trip #TR-819</div>
+          </div>
+          <div class="bi-right"><div class="bi-amount">₹14,500</div><div class="bi-status bs-transit">In Transit</div></div>
+        </div>
+        <div class="booking-item">
+          <div class="bi-icon ki-amber">🏭</div>
+          <div class="bi-info">
+            <div class="bi-name">Pune ColdHub Facility</div>
+            <div class="bi-sub">45 MT · Frozen · 15 days · Booking #BK-2036</div>
+          </div>
+          <div class="bi-right"><div class="bi-amount">₹81,000</div><div class="bi-status bs-pending">Pending Pay</div></div>
+        </div>
+        <div class="booking-item">
+          <div class="bi-icon" style="background:#F3E8FF;">🚛</div>
+          <div class="bi-info">
+            <div class="bi-name">Mahesh Cold Transport</div>
+            <div class="bi-sub">7 MT · Nashik → Mumbai · Trip #TR-814</div>
+          </div>
+          <div class="bi-right"><div class="bi-amount">₹22,000</div><div class="bi-status bs-completed">Completed</div></div>
+        </div>
+      </div>
+
+      <!-- BIDS + ALERTS -->
+      <div style="display:flex;flex-direction:column;gap:18px;">
+        <!-- BIDS -->
+        <div class="card">
+          <div class="card-header">
+            <div class="ch-left"><div class="ch-icon" style="background:#EDE9FE;">⚖️</div><div><div class="ch-title">Live Bids Received</div><div class="ch-sub">Compare and select</div></div></div>
+            <a class="ch-link" href="producer_bid.html">Compare →</a>
+          </div>
+          <div class="bid-item">
+            <div class="bid-top"><div class="bid-id">RFQ-0041</div><div class="bid-timer">⏱ 2h 14m left</div></div>
+            <div><span class="bid-company">Nashik Agri Cold Stores</span><span class="bid-type bt-storage">Storage</span></div>
+            <div class="bid-details"><span>💰 ₹420/MT/day</span><span>📍 48 km</span><span>⭐ 4.7</span><span>🧊 Frozen</span></div>
+            <div class="bid-actions">
+              <button class="ba-btn ba-compare" onclick="window.location='producer_bid.html'">Compare 4 Bids</button>
+              <button class="ba-btn ba-book">Book Now</button>
+            </div>
+          </div>
+          <div class="bid-item">
+            <div class="bid-top"><div class="bid-id">RFQ-0039</div><div class="bid-timer">⏱ 5h 30m left</div></div>
+            <div><span class="bid-company">Kiran Reefer Transport</span><span class="bid-type bt-transport">Transport</span></div>
+            <div class="bid-details"><span>💰 ₹85/km</span><span>📍 12 km</span><span>⭐ 4.9</span><span>🚛 14 FT</span></div>
+            <div class="bid-actions">
+              <button class="ba-btn ba-compare" onclick="window.location='producer_bid.html'">Compare 7 Bids</button>
+              <button class="ba-btn ba-book">Book Now</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ALERTS -->
+        <div class="card">
+          <div class="card-header">
+            <div class="ch-left"><div class="ch-icon" style="background:#FEE2E2;">🔔</div><div><div class="ch-title">Recent Alerts</div></div></div>
+          </div>
+          <div class="alert-item"><div class="alert-dot ad-red"></div><div><div class="alert-text">Temperature drift in Nashik Cold · Unit D — currently at -4°C (target -18°C)</div><div class="alert-time">12 minutes ago</div></div></div>
+          <div class="alert-item"><div class="alert-dot ad-green"></div><div><div class="alert-text">Booking #BK-2041 payment confirmed — Shree Krishna Cold Storage</div><div class="alert-time">1 hour ago</div></div></div>
+          <div class="alert-item"><div class="alert-dot ad-amber"></div><div><div class="alert-text">New bid received for RFQ-0041 from Western Agri Stores</div><div class="alert-time">3 hours ago</div></div></div>
+          <div class="alert-item"><div class="alert-dot ad-blue"></div><div><div class="alert-text">Trip #TR-819 picked up from APMC Vashi — ETA 2:30 PM Pune</div><div class="alert-time">4 hours ago</div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LIVE TRACKING + ANALYTICS + QUICK ACTIONS -->
+    <div class="bottom-grid">
+      <!-- LIVE TRACKING -->
+      <div class="card">
+        <div class="card-header">
+          <div class="ch-left"><div class="ch-icon" style="background:#DBEAFE;">📍</div><div><div class="ch-title">Live Tracking</div><div class="ch-sub">Active shipments</div></div></div>
+          <a class="ch-link" href="#">Map View →</a>
+        </div>
+        <div class="track-item">
+          <div class="track-header"><div class="track-id">Trip #TR-819 · Kiran Reefer</div><div class="track-status ts-in-transit">In Transit</div></div>
+          <div class="track-route"><div class="track-dot" style="background:#22C55E;"></div>APMC Vashi<div style="flex:1;border-top:1px dashed #CBD5E1;"></div><div class="track-dot" style="background:#3B82F6;"></div>Pimpri, Pune</div>
+          <div class="track-progress-bar"><div class="track-fill" style="width:62%;"></div></div>
+          <div class="track-meta"><span>62% complete</span><span>ETA 2:30 PM</span></div>
+          <div style="font-size:11px;color:var(--muted);margin-top:5px;">🌡 Cab Temp: 3.2°C · ✅ Normal · 🛣 48 km remaining</div>
+        </div>
+        <div class="track-item">
+          <div class="track-header"><div class="track-id">Storage #BK-2041 · Shree Krishna</div><div class="track-status ts-storage">In Storage</div></div>
+          <div style="font-size:12px;color:var(--muted);margin-bottom:6px;">80 MT Alphonso Mango · Chamber A</div>
+          <div class="track-progress-bar"><div class="track-fill" style="width:40%;background:linear-gradient(90deg,var(--green),#22C55E);"></div></div>
+          <div class="track-meta"><span>12 of 30 days used</span><span>Exits Aug 28</span></div>
+          <div style="font-size:11px;color:var(--muted);margin-top:5px;">🌡 -20°C · ❄ Frozen · ✅ SLA 100%</div>
+        </div>
+      </div>
+
+      <!-- ANALYTICS -->
+      <div class="card">
+        <div class="card-header">
+          <div class="ch-left"><div class="ch-icon" style="background:#DCFCE7;">📈</div><div><div class="ch-title">Monthly Analytics</div></div></div>
+        </div>
+        <div style="padding:16px 20px;">
+          <div style="font-size:11px;font-weight:600;color:var(--muted);margin-bottom:10px;">Spending by Category</div>
+          <div class="analytic-row"><div class="an-label">Cold Storage</div><div class="an-bar"><div class="an-fill" style="width:65%;background:var(--brand-teal);"></div></div><div class="an-val">65%</div></div>
+          <div class="analytic-row"><div class="an-label">Reefer Trucks</div><div class="an-bar"><div class="an-fill" style="width:28%;background:#7C3AED;"></div></div><div class="an-val">28%</div></div>
+          <div class="analytic-row"><div class="an-label">Handling</div><div class="an-bar"><div class="an-fill" style="width:7%;background:var(--amber);"></div></div><div class="an-val">7%</div></div>
+          <div class="analytic-row" style="margin-top:14px;"><div class="an-label">On-time SLA</div><div class="an-bar"><div class="an-fill" style="width:96%;background:var(--green);"></div></div><div class="an-val" style="color:var(--green);">96%</div></div>
+          <div class="analytic-row"><div class="an-label">Temp Comply</div><div class="an-bar"><div class="an-fill" style="width:98%;background:var(--brand-ice);"></div></div><div class="an-val" style="color:var(--brand-teal);">98%</div></div>
+          <div style="margin-top:16px;padding-top:12px;border-top:1px solid #F1F5F9;display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+            <div style="text-align:center;"><div style="font-family:'Sora',sans-serif;font-size:18px;font-weight:800;color:var(--text);">4.8</div><div style="font-size:10px;color:var(--muted);">Avg Rating ⭐</div></div>
+            <div style="text-align:center;"><div style="font-family:'Sora',sans-serif;font-size:18px;font-weight:800;color:var(--green);">₹4.2L</div><div style="font-size:10px;color:var(--muted);">This Month</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- QUICK ACTIONS -->
+      <div class="card">
+        <div class="card-header">
+          <div class="ch-left"><div class="ch-icon" style="background:#FEF3C7;">⚡</div><div><div class="ch-title">Quick Actions</div></div></div>
+        </div>
+        <div class="quick-actions">
+          <a class="qa" href="producer_booking.html"><div class="qa-icon" style="background:#DBEAFE;">⚡</div><div><div class="qa-label">Instant Book</div><div class="qa-desc">Book reefer or storage now</div></div></a>
+          <a class="qa" href="producer_bid.html"><div class="qa-icon" style="background:#EDE9FE;">⚖️</div><div><div class="qa-label">Raise RFQ</div><div class="qa-desc">Get bids & compare</div></div></a>
+          <a class="qa" href="producer_payment.html"><div class="qa-icon" style="background:#DCFCE7;">💳</div><div><div class="qa-label">Pay Invoice</div><div class="qa-desc">₹1.1L pending</div></div></a>
+          <a class="qa" href="#"><div class="qa-icon" style="background:#CCFBF1;">📊</div><div><div class="qa-label">View Analytics</div><div class="qa-desc">Usage & trends</div></div></a>
+          <a class="qa" href="#"><div class="qa-icon" style="background:#FEE2E2;">🔔</div><div><div class="qa-label">Set Alerts</div><div class="qa-desc">Temp & SLA alerts</div></div></a>
+          <a class="qa" href="#"><div class="qa-icon" style="background:#FEF3C7;">⭐</div><div><div class="qa-label">Rate Partners</div><div class="qa-desc">2 pending ratings</div></div></a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</body>
+</html>

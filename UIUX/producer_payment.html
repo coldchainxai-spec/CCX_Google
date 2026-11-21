@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ColdChainX — Producer Payments</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{--brand-teal:#0F766E;--brand-blue:#00329B;--brand-ice:#38BDF8;--bg:#F0F5FF;--white:#fff;--border:#E2E8F0;--text:#0F172A;--muted:#64748B;--green:#16A34A;--amber:#D97706;--red:#DC2626;}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);display:flex;min-height:100vh;}
+
+.sidebar{width:220px;background:#00329B;min-height:100vh;flex-shrink:0;display:flex;flex-direction:column;}
+.sb-brand{padding:16px;border-bottom:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;gap:9px;}
+.sb-logo{width:30px;height:30px;background:rgba(255,255,255,0.15);border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.sb-name{font-family:'Sora',sans-serif;font-size:14px;font-weight:800;color:#fff;}
+.sb-name span{color:#38BDF8;}
+.sb-nav{padding:10px 8px;flex:1;}
+.nav-grp{font-size:9px;color:rgba(255,255,255,0.3);font-weight:700;letter-spacing:0.8px;text-transform:uppercase;padding:10px 8px 4px;}
+.nav-item{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;font-size:12px;color:rgba(255,255,255,0.6);cursor:pointer;transition:all .15s;text-decoration:none;border-left:2px solid transparent;margin-bottom:1px;}
+.nav-item:hover{background:rgba(255,255,255,0.07);color:#fff;}
+.nav-item.active{background:rgba(255,255,255,0.14);color:#fff;border-left-color:#38BDF8;}
+.nav-item .ni{font-size:13px;width:16px;text-align:center;flex-shrink:0;}
+
+.main{flex:1;}
+.topbar{background:#fff;border-bottom:1px solid var(--border);padding:0 28px;height:56px;display:flex;align-items:center;justify-content:space-between;}
+.page-title{font-family:'Sora',sans-serif;font-size:15px;font-weight:700;color:var(--text);}
+.content{padding:24px 28px;}
+
+/* KPI */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px;}
+.kpi{background:#fff;border-radius:12px;border:1px solid var(--border);padding:16px;}
+.kpi-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;margin-bottom:10px;}
+.ki-g{background:#DCFCE7;}.ki-a{background:#FEF3C7;}.ki-r{background:#FEE2E2;}.ki-b{background:#DBEAFE;}
+.kpi-val{font-family:'Sora',sans-serif;font-size:22px;font-weight:800;color:var(--text);}
+.kpi-label{font-size:11px;color:var(--muted);margin-top:2px;}
+.kpi-sub{font-size:10px;margin-top:4px;font-weight:600;}
+
+/* MAIN GRID */
+.pay-layout{display:grid;grid-template-columns:1fr 360px;gap:20px;}
+
+/* CARD */
+.card{background:#fff;border-radius:14px;border:1px solid var(--border);}
+.card-head{padding:15px 20px;border-bottom:1px solid #F8FAFC;display:flex;align-items:center;justify-content:space-between;}
+.ch-left{display:flex;align-items:center;gap:10px;}
+.ch-icon{width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;}
+.ch-title{font-size:13px;font-weight:700;color:var(--text);}
+.ch-sub{font-size:10px;color:var(--muted);margin-top:1px;}
+
+/* INVOICE TABLE */
+.inv-table{width:100%;border-collapse:collapse;}
+.inv-table th{background:#F8FAFC;padding:10px 16px;text-align:left;font-size:11px;font-weight:700;color:var(--muted);border-bottom:1px solid var(--border);}
+.inv-table td{padding:12px 16px;border-bottom:1px solid #F8FAFC;font-size:12px;vertical-align:middle;}
+.inv-table tr:hover td{background:#FAFBFF;}
+.inv-id{font-weight:700;color:var(--brand-blue);}
+.inv-vendor{font-weight:600;color:var(--text);}
+.inv-sub{font-size:10px;color:var(--muted);}
+.amount-col{font-family:'Sora',sans-serif;font-size:14px;font-weight:800;color:var(--text);}
+.status-pill{font-size:10px;font-weight:700;padding:3px 9px;border-radius:4px;display:inline-block;}
+.sp-paid{background:#DCFCE7;color:#15803D;}
+.sp-due{background:#FEF3C7;color:#92400E;}
+.sp-overdue{background:#FEE2E2;color:#991B1B;}
+.sp-processing{background:#DBEAFE;color:#1E40AF;}
+.pay-btn{padding:6px 12px;background:var(--brand-blue);color:#fff;border:none;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;}
+.dl-btn{padding:6px 10px;background:#F1F5F9;color:var(--muted);border:none;border-radius:6px;font-size:11px;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;}
+
+/* PAYMENT MODAL CARD */
+.pay-modal{background:linear-gradient(135deg,#00329B,#0F766E);border-radius:16px;padding:22px;margin-bottom:16px;position:relative;overflow:hidden;}
+.pay-modal::before{content:'₹';position:absolute;right:-10px;top:-20px;font-size:100px;color:rgba(255,255,255,0.05);font-weight:900;}
+.pm-label{font-size:11px;color:rgba(255,255,255,0.65);margin-bottom:4px;font-weight:500;}
+.pm-amount{font-family:'Sora',sans-serif;font-size:32px;font-weight:800;color:#fff;}
+.pm-sub{font-size:11px;color:rgba(255,255,255,0.65);margin-top:4px;}
+.pm-inv-id{font-size:12px;color:#38BDF8;margin-top:8px;font-weight:600;}
+
+/* PAYMENT METHODS */
+.pay-methods{display:flex;flex-direction:column;gap:8px;margin-bottom:16px;}
+.pm-option{border:2px solid var(--border);border-radius:10px;padding:12px 14px;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:12px;}
+.pm-option:hover,.pm-option.selected{border-color:var(--brand-blue);background:#EFF6FF;}
+.pm-option-icon{width:36px;height:36px;border-radius:8px;background:#F1F5F9;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.pm-option-label{font-size:13px;font-weight:700;color:var(--text);}
+.pm-option-sub{font-size:10px;color:var(--muted);}
+.pm-radio{width:16px;height:16px;border-radius:50%;border:2px solid #CBD5E1;margin-left:auto;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+.pm-option.selected .pm-radio{border-color:var(--brand-blue);}
+.pm-option.selected .pm-radio::after{content:'';width:8px;height:8px;border-radius:50%;background:var(--brand-blue);}
+
+.fg{margin-bottom:12px;}
+.fl{display:block;font-size:11px;color:var(--muted);font-weight:600;margin-bottom:4px;}
+.fi{height:40px;border:1.5px solid var(--border);border-radius:9px;padding:0 12px;font-size:13px;color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;outline:none;transition:all .15s;width:100%;background:#fff;}
+.fi:focus{border-color:var(--brand-blue);}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+
+/* UPI BOX */
+.upi-box{background:#F8FAFC;border:1.5px solid var(--border);border-radius:10px;padding:14px;margin-bottom:14px;}
+.upi-label{font-size:11px;color:var(--muted);margin-bottom:4px;}
+.upi-id{font-size:15px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px;}
+.upi-badge{font-size:10px;background:#DCFCE7;color:#15803D;padding:2px 7px;border-radius:4px;font-weight:600;}
+.upi-qr{width:80px;height:80px;background:var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:30px;margin-top:10px;}
+
+.btn-pay{width:100%;height:48px;border:none;border-radius:10px;background:linear-gradient(135deg,var(--green),#14B8A6);font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:800;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;margin-top:4px;}
+.btn-pay:hover{opacity:.92;transform:translateY(-1px);}
+.secure-note{text-align:center;font-size:11px;color:#94A3B8;margin-top:8px;display:flex;align-items:center;justify-content:center;gap:5px;}
+
+/* TRANSACTION HISTORY */
+.tx-item{display:flex;align-items:center;gap:12px;padding:12px 20px;border-bottom:1px solid #F8FAFC;}
+.tx-item:last-child{border-bottom:none;}
+.tx-icon{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
+.tx-info{flex:1;}
+.tx-name{font-size:12px;font-weight:600;color:var(--text);}
+.tx-sub{font-size:10px;color:var(--muted);}
+.tx-amount{font-family:'Sora',sans-serif;font-size:14px;font-weight:800;}
+.tx-date{font-size:10px;color:var(--muted);text-align:right;margin-top:2px;}
+
+/* SUMMARY CARD */
+.summary-row{display:flex;justify-content:space-between;padding:10px 20px;border-bottom:1px solid #F8FAFC;font-size:12px;}
+.sr-label{color:var(--muted);}
+.sr-val{font-weight:700;color:var(--text);}
+
+@media(max-width:1000px){.pay-layout{grid-template-columns:1fr;}.kpi-grid{grid-template-columns:1fr 1fr;}}
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+  <div class="sb-brand">
+    <div class="sb-logo"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg></div>
+    <div class="sb-name">Cold<span>Chain</span>X</div>
+  </div>
+  <div class="sb-nav">
+    <div class="nav-grp">Main</div>
+    <a class="nav-item" href="producer_dashboard.html"><span class="ni">📊</span> Dashboard</a>
+    <a class="nav-item" href="producer_booking.html"><span class="ni">⚡</span> Instant Book</a>
+    <a class="nav-item" href="producer_booking.html"><span class="ni">⚖️</span> Bid & Compare</a>
+    <div class="nav-grp">Manage</div>
+    <a class="nav-item" href="#"><span class="ni">📦</span> My Bookings</a>
+    <a class="nav-item" href="#"><span class="ni">📍</span> Live Tracking</a>
+    <a class="nav-item active"><span class="ni">💳</span> Payments</a>
+    <a class="nav-item" href="#"><span class="ni">📋</span> Invoices</a>
+    <div class="nav-grp">Account</div>
+    <a class="nav-item" href="#"><span class="ni">👤</span> Profile</a>
+    <a class="nav-item" href="#"><span class="ni">🔔</span> Alerts</a>
+    <a class="nav-item" href="#"><span class="ni">🎧</span> Support</a>
+  </div>
+</div>
+
+<div class="main">
+  <div class="topbar">
+    <div>
+      <div class="page-title">💳 Payments & Billing</div>
+      <div style="font-size:11px;color:var(--muted);">Manage invoices, pay dues, download receipts</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <button style="padding:8px 16px;background:var(--brand-blue);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;">+ Add Payment Method</button>
+      <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--brand-teal),var(--brand-ice));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;">RK</div>
+    </div>
+  </div>
+
+  <div class="content">
+    <!-- KPI -->
+    <div class="kpi-grid">
+      <div class="kpi">
+        <div class="kpi-icon ki-g">💰</div>
+        <div class="kpi-val">₹4.2L</div>
+        <div class="kpi-label">Total Spent (Aug)</div>
+        <div class="kpi-sub" style="color:var(--green);">↑ 12% vs Jul</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-icon ki-a">⏳</div>
+        <div class="kpi-val">₹1.1L</div>
+        <div class="kpi-label">Pending Payments</div>
+        <div class="kpi-sub" style="color:var(--amber);">3 invoices due</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-icon ki-r">🚨</div>
+        <div class="kpi-val">₹28,000</div>
+        <div class="kpi-label">Overdue</div>
+        <div class="kpi-sub" style="color:var(--red);">INV-039 · 5 days</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-icon ki-b">🧾</div>
+        <div class="kpi-val">24</div>
+        <div class="kpi-label">Invoices This Month</div>
+        <div class="kpi-sub" style="color:var(--muted);">21 paid · 3 pending</div>
+      </div>
+    </div>
+
+    <div class="pay-layout">
+      <!-- LEFT: INVOICES + TRANSACTIONS -->
+      <div>
+        <!-- PENDING INVOICES -->
+        <div class="card" style="margin-bottom:18px;">
+          <div class="card-head">
+            <div class="ch-left"><div class="ch-icon" style="background:#FEF3C7;">🧾</div><div><div class="ch-title">Pending Invoices</div><div class="ch-sub">3 invoices require payment</div></div></div>
+            <div style="font-size:12px;color:var(--muted);display:flex;gap:10px;">
+              <select style="height:30px;border:1px solid var(--border);border-radius:6px;padding:0 8px;font-size:11px;font-family:'Plus Jakarta Sans',sans-serif;outline:none;background:#fff;color:var(--text);">
+                <option>All Months</option><option>August 2025</option><option>July 2025</option>
+              </select>
+            </div>
+          </div>
+          <div style="overflow-x:auto;">
+            <table class="inv-table">
+              <thead>
+                <tr>
+                  <th>Invoice</th>
+                  <th>Partner</th>
+                  <th>Service</th>
+                  <th>Due Date</th>
+                  <th>Amount</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="background:#FFF7F7;">
+                  <td><div class="inv-id">INV-039</div></td>
+                  <td><div class="inv-vendor">Pune ColdHub</div><div class="inv-sub">BK-2036 · 45 MT · Frozen</div></td>
+                  <td><span style="font-size:10px;background:#CCFBF1;color:#0F766E;padding:2px 6px;border-radius:3px;font-weight:600;">Storage</span></td>
+                  <td><span style="color:var(--red);font-weight:600;font-size:12px;">Jul 27 ⚠</span></td>
+                  <td><div class="amount-col" style="color:var(--red);">₹81,000</div></td>
+                  <td><span class="status-pill sp-overdue">Overdue</span></td>
+                  <td><button class="pay-btn" onclick="selectInvoice('INV-039','₹81,000','Pune ColdHub')">Pay Now</button></td>
+                </tr>
+                <tr>
+                  <td><div class="inv-id">INV-042</div></td>
+                  <td><div class="inv-vendor">Kiran Reefer Transport</div><div class="inv-sub">TR-819 · APMC → Pune</div></td>
+                  <td><span style="font-size:10px;background:#F3E8FF;color:#7C3AED;padding:2px 6px;border-radius:3px;font-weight:600;">Transport</span></td>
+                  <td>Aug 03</td>
+                  <td><div class="amount-col">₹11,525</div></td>
+                  <td><span class="status-pill sp-due">Due Soon</span></td>
+                  <td><button class="pay-btn" onclick="selectInvoice('INV-042','₹11,525','Kiran Reefer Transport')">Pay Now</button></td>
+                </tr>
+                <tr>
+                  <td><div class="inv-id">INV-044</div></td>
+                  <td><div class="inv-vendor">Shree Krishna Cold Storage</div><div class="inv-sub">BK-2041 · 80 MT · Chilled</div></td>
+                  <td><span style="font-size:10px;background:#CCFBF1;color:#0F766E;padding:2px 6px;border-radius:3px;font-weight:600;">Storage</span></td>
+                  <td>Aug 15</td>
+                  <td><div class="amount-col">₹1,08,000</div></td>
+                  <td><span class="status-pill sp-due">Upcoming</span></td>
+                  <td><button class="pay-btn">Pay Now</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- TRANSACTION HISTORY -->
+        <div class="card">
+          <div class="card-head">
+            <div class="ch-left"><div class="ch-icon" style="background:#DCFCE7;">✅</div><div><div class="ch-title">Transaction History</div><div class="ch-sub">Recent paid invoices</div></div></div>
+            <button style="padding:6px 12px;background:#F1F5F9;border:none;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;color:var(--muted);font-family:'Plus Jakarta Sans',sans-serif;">Download All PDF</button>
+          </div>
+          <div class="tx-item">
+            <div class="tx-icon" style="background:#DCFCE7;">✅</div>
+            <div class="tx-info"><div class="tx-name">Nashik Agri Cold Stores · INV-033</div><div class="tx-sub">BK-2029 · 60 MT · Frozen · 20 days</div></div>
+            <div style="text-align:right;"><div class="tx-amount" style="color:var(--red);">-₹50,400</div><div class="tx-date">Jul 28 · UPI</div></div>
+          </div>
+          <div class="tx-item">
+            <div class="tx-icon" style="background:#F3E8FF;">🚛</div>
+            <div class="tx-info"><div class="tx-name">Mahesh Transport · INV-031</div><div class="tx-sub">TR-814 · Mumbai → Nashik · 7 MT</div></div>
+            <div style="text-align:right;"><div class="tx-amount" style="color:var(--red);">-₹22,000</div><div class="tx-date">Jul 25 · Bank Transfer</div></div>
+          </div>
+          <div class="tx-item">
+            <div class="tx-icon" style="background:#DBEAFE;">🏦</div>
+            <div class="tx-info"><div class="tx-name">Platform Cashback · CB-018</div><div class="tx-sub">Loyalty reward — 3 bookings in July</div></div>
+            <div style="text-align:right;"><div class="tx-amount" style="color:var(--green);">+₹2,400</div><div class="tx-date">Jul 24 · Wallet</div></div>
+          </div>
+          <div class="tx-item">
+            <div class="tx-icon" style="background:#DCFCE7;">✅</div>
+            <div class="tx-info"><div class="tx-name">Western Agri Stores · INV-028</div><div class="tx-sub">BK-2018 · 40 MT · Ambient · 7 days</div></div>
+            <div style="text-align:right;"><div class="tx-amount" style="color:var(--red);">-₹19,600</div><div class="tx-date">Jul 20 · UPI</div></div>
+          </div>
+          <div class="tx-item">
+            <div class="tx-icon" style="background:#FEF3C7;">🏭</div>
+            <div class="tx-info"><div class="tx-name">Shree Krishna Cold Storage · INV-026</div><div class="tx-sub">BK-2014 · 100 MT · Frozen · 30 days</div></div>
+            <div style="text-align:right;"><div class="tx-amount" style="color:var(--red);">-₹1,26,000</div><div class="tx-date">Jul 16 · Escrow</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: PAY NOW + BILLING -->
+      <div>
+        <!-- PAY NOW CARD -->
+        <div class="card" style="margin-bottom:16px;overflow:hidden;">
+          <div class="pay-modal">
+            <div class="pm-label">Amount to Pay</div>
+            <div class="pm-amount" id="pay-amount">₹81,000</div>
+            <div class="pm-sub" id="pay-vendor">Pune ColdHub · Storage · 45 MT · Frozen</div>
+            <div class="pm-inv-id" id="pay-inv">Invoice: INV-039 · Due: Jul 27 ⚠ Overdue</div>
+          </div>
+          <div style="padding:18px 18px 0;">
+            <div style="font-size:11px;font-weight:700;color:var(--muted);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.5px;">Choose Payment Method</div>
+            <div class="pay-methods">
+              <div class="pm-option selected" onclick="selectMethod(this)">
+                <div class="pm-option-icon">📱</div>
+                <div><div class="pm-option-label">UPI Payment</div><div class="pm-option-sub">rajan@axisbank · Instant</div></div>
+                <div class="pm-radio" style="border-color:var(--brand-blue);"><div style="width:8px;height:8px;border-radius:50%;background:var(--brand-blue);"></div></div>
+              </div>
+              <div class="pm-option" onclick="selectMethod(this)">
+                <div class="pm-option-icon">🏦</div>
+                <div><div class="pm-option-label">Bank Transfer</div><div class="pm-option-sub">HDFC ••••4521 · 2–4 hrs</div></div>
+                <div class="pm-radio"></div>
+              </div>
+              <div class="pm-option" onclick="selectMethod(this)">
+                <div class="pm-option-icon">🔒</div>
+                <div><div class="pm-option-label">Escrow (Platform)</div><div class="pm-option-sub">Released on delivery confirmation</div></div>
+                <div class="pm-radio"></div>
+              </div>
+              <div class="pm-option" onclick="selectMethod(this)">
+                <div class="pm-option-icon">💳</div>
+                <div><div class="pm-option-label">Credit Card</div><div class="pm-option-sub">Visa / Mastercard</div></div>
+                <div class="pm-radio"></div>
+              </div>
+            </div>
+
+            <!-- UPI SECTION -->
+            <div class="upi-box">
+              <div class="upi-label">Your UPI ID</div>
+              <div class="upi-id">rajan@axisbank <span class="upi-badge">✓ Verified</span></div>
+              <div class="upi-qr">📱</div>
+              <div style="font-size:10px;color:var(--muted);margin-top:6px;">Scan QR code with any UPI app</div>
+            </div>
+
+            <!-- BREAKDOWN -->
+            <div style="background:#F8FAFC;border-radius:10px;padding:12px;margin-bottom:14px;">
+              <div style="display:flex;justify-content:space-between;font-size:12px;padding:3px 0;"><span style="color:var(--muted);">Invoice amount</span><span style="font-weight:600;">₹81,000</span></div>
+              <div style="display:flex;justify-content:space-between;font-size:12px;padding:3px 0;"><span style="color:var(--muted);">Late fee (5 days)</span><span style="font-weight:600;color:var(--red);">₹1,620</span></div>
+              <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:800;padding-top:8px;border-top:1px solid var(--border);margin-top:6px;color:var(--brand-blue);"><span>Total Due</span><span>₹82,620</span></div>
+            </div>
+          </div>
+          <div style="padding:0 18px 18px;">
+            <button class="btn-pay">🔒 Pay ₹82,620 Securely</button>
+            <div class="secure-note">🔐 256-bit SSL · Powered by Razorpay · GST receipt auto-generated</div>
+          </div>
+        </div>
+
+        <!-- BILLING SUMMARY -->
+        <div class="card" style="margin-bottom:16px;">
+          <div class="card-head">
+            <div class="ch-left"><div class="ch-icon" style="background:#DBEAFE;">📊</div><div><div class="ch-title">Billing Summary</div><div class="ch-sub">August 2025</div></div></div>
+          </div>
+          <div class="summary-row"><span class="sr-label">Cold Storage charges</span><span class="sr-val">₹2,89,400</span></div>
+          <div class="summary-row"><span class="sr-label">Transport charges</span><span class="sr-val">₹1,14,025</span></div>
+          <div class="summary-row"><span class="sr-label">Platform fees</span><span class="sr-val">₹12,570</span></div>
+          <div class="summary-row"><span class="sr-label">GST (18%)</span><span class="sr-val">₹74,700</span></div>
+          <div class="summary-row"><span class="sr-label">Cashback / Loyalty</span><span class="sr-val" style="color:var(--green);">-₹2,400</span></div>
+          <div style="padding:12px 20px;border-top:2px solid var(--border);display:flex;justify-content:space-between;"><span style="font-size:14px;font-weight:800;color:var(--text);">Grand Total</span><span style="font-family:'Sora',sans-serif;font-size:16px;font-weight:800;color:var(--brand-blue);">₹4,88,295</span></div>
+        </div>
+
+        <!-- BANK ACCOUNT -->
+        <div class="card">
+          <div class="card-head">
+            <div class="ch-left"><div class="ch-icon" style="background:#F3E8FF;">🏦</div><div><div class="ch-title">Saved Payment Methods</div></div></div>
+            <button style="font-size:11px;font-weight:600;color:var(--brand-blue);background:none;border:none;cursor:pointer;">+ Add New</button>
+          </div>
+          <div style="padding:14px 18px;display:flex;flex-direction:column;gap:10px;">
+            <div style="border:1.5px solid var(--brand-blue);background:#EFF6FF;border-radius:10px;padding:12px;display:flex;align-items:center;gap:10px;">
+              <div style="width:34px;height:34px;background:#DBEAFE;border-radius:8px;display:flex;align-items:center;justify-content:center;">📱</div>
+              <div style="flex:1;"><div style="font-size:12px;font-weight:700;">UPI — rajan@axisbank</div><div style="font-size:10px;color:var(--muted);">Default · Axis Bank</div></div>
+              <span style="font-size:10px;background:#DCFCE7;color:#15803D;padding:2px 6px;border-radius:3px;font-weight:700;">✓ Primary</span>
+            </div>
+            <div style="border:1.5px solid var(--border);border-radius:10px;padding:12px;display:flex;align-items:center;gap:10px;">
+              <div style="width:34px;height:34px;background:#F1F5F9;border-radius:8px;display:flex;align-items:center;justify-content:center;">🏦</div>
+              <div style="flex:1;"><div style="font-size:12px;font-weight:700;">HDFC Bank · ••••4521</div><div style="font-size:10px;color:var(--muted);">Savings · IFSC: HDFC0001234</div></div>
+              <button style="font-size:10px;font-weight:600;color:var(--muted);background:#F1F5F9;border:none;border-radius:5px;padding:3px 8px;cursor:pointer;">Set Default</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function selectInvoice(id, amount, vendor) {
+  document.getElementById('pay-amount').textContent = amount;
+  document.getElementById('pay-inv').textContent = 'Invoice: ' + id;
+  document.getElementById('pay-vendor').textContent = vendor;
+}
+function selectMethod(el) {
+  document.querySelectorAll('.pm-option').forEach(e => e.classList.remove('selected'));
+  el.classList.add('selected');
+}
+</script>
+</body>
+</html>

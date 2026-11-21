@@ -1,0 +1,2407 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ColdChainX — AI-Powered Cold Chain Booking Agent</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Sora:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<!-- Preload Data -->
+<script src="facilities-data.js"></script>
+
+<style>
+/* ========================================================
+   CSS VARIABLES & PROFESSIONAL THEME SYSTEM (DARK & LIGHT)
+======================================================== */
+:root {
+  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-heading: 'Sora', 'Outfit', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  
+  /* Brand Shared Accents */
+  --blue-primary: #0047BA;
+  --blue-hover: #1D4ED8;
+  --cyan-ice: #38BDF8;
+  --cyan-deep: #0284C7;
+  --teal-mint: #2DD4BF;
+  --emerald-green: #10B981;
+  --amber-warning: #F59E0B;
+  --rose-danger: #F43F5E;
+}
+
+/* DARK THEME (Enterprise Midnight) */
+[data-theme="dark"] {
+  --bg-body: #030814;
+  --bg-header: rgba(5, 14, 28, 0.88);
+  --bg-card: #08172E;
+  --bg-card-hover: #0D2242;
+  --bg-surface: #0E2442;
+  --bg-surface-elevated: #143158;
+  --bg-input: #061326;
+  --bg-drawer: #061326;
+  
+  --border-light: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.16);
+  --border-cyan: rgba(56, 189, 248, 0.35);
+  --border-focus: #38BDF8;
+  
+  --text-main: #F8FAFC;
+  --text-muted: #94A3B8;
+  --text-dim: #64748B;
+  --text-accent: #38BDF8;
+  
+  --chat-agent-bg: #0A1C36;
+  --chat-agent-border: rgba(255, 255, 255, 0.09);
+  --chat-user-bg: linear-gradient(135deg, #0047BA, #1E40AF);
+  
+  --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  --glow: 0 0 25px rgba(56, 189, 248, 0.15);
+  --modal-backdrop: rgba(2, 6, 18, 0.85);
+  
+  --badge-cyan-bg: rgba(56, 189, 248, 0.12);
+  --badge-cyan-border: rgba(56, 189, 248, 0.35);
+  --badge-cyan-text: #38BDF8;
+  
+  --badge-green-bg: rgba(16, 185, 129, 0.12);
+  --badge-green-border: rgba(16, 185, 129, 0.35);
+  --badge-green-text: #34D399;
+}
+
+/* LIGHT THEME (Corporate Executive Clean) */
+[data-theme="light"] {
+  --bg-body: #F4F7FC;
+  --bg-header: rgba(255, 255, 255, 0.94);
+  --bg-card: #FFFFFF;
+  --bg-card-hover: #F8FAFC;
+  --bg-surface: #EDF3FA;
+  --bg-surface-elevated: #E2E8F0;
+  --bg-input: #FFFFFF;
+  --bg-drawer: #FFFFFF;
+  
+  --border-light: #E2E8F0;
+  --border-strong: #CBD5E1;
+  --border-cyan: rgba(2, 132, 199, 0.35);
+  --border-focus: #0284C7;
+  
+  --text-main: #0F172A;
+  --text-muted: #475569;
+  --text-dim: #64748B;
+  --text-accent: #0284C7;
+  
+  --chat-agent-bg: #FFFFFF;
+  --chat-agent-border: #E2E8F0;
+  --chat-user-bg: linear-gradient(135deg, #0047BA, #0284C7);
+  
+  --card-shadow: 0 4px 18px rgba(0, 40, 100, 0.06);
+  --glow: 0 0 20px rgba(0, 71, 186, 0.08);
+  --modal-backdrop: rgba(15, 23, 42, 0.65);
+  
+  --badge-cyan-bg: rgba(2, 132, 199, 0.08);
+  --badge-cyan-border: rgba(2, 132, 199, 0.25);
+  --badge-cyan-text: #0284C7;
+  
+  --badge-green-bg: rgba(16, 185, 129, 0.08);
+  --badge-green-border: rgba(16, 185, 129, 0.25);
+  --badge-green-text: #059669;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: var(--font-sans);
+  background-color: var(--bg-body);
+  color: var(--text-main);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  transition: background-color var(--transition-normal), color var(--transition-normal);
+  overflow-x: hidden;
+}
+
+/* Scrollbars */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-body); }
+::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--cyan-ice); }
+
+/* ========================================================
+   TOPBAR HEADER
+======================================================== */
+header {
+  background: var(--bg-header);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border-light);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  padding: 0 24px;
+  height: 68px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: background-color var(--transition-normal), border-color var(--transition-normal);
+}
+
+.brand-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  text-decoration: none;
+}
+.brand-logo {
+  width: 38px;
+  height: 38px;
+  background: linear-gradient(135deg, #0047BA, #38BDF8);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 16px rgba(56, 189, 248, 0.35);
+}
+.brand-logo svg { filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2)); }
+.brand-title {
+  font-family: var(--font-heading);
+  font-size: 19px;
+  font-weight: 800;
+  letter-spacing: -0.4px;
+  color: var(--text-main);
+}
+.brand-pill {
+  font-size: 10px;
+  text-transform: uppercase;
+  background: var(--badge-cyan-bg);
+  border: 1px solid var(--badge-cyan-border);
+  color: var(--badge-cyan-text);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+/* Nav Tabs */
+.nav-tabs {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--bg-surface);
+  padding: 4px;
+  border-radius: 12px;
+  border: 1px solid var(--border-light);
+}
+.nav-tab {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+.nav-tab:hover {
+  color: var(--text-main);
+  background: rgba(125, 125, 125, 0.08);
+}
+.nav-tab.active {
+  background: var(--blue-primary);
+  color: #FFFFFF;
+  box-shadow: 0 2px 10px rgba(0, 71, 186, 0.35);
+}
+
+/* Header Right Actions */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+/* Theme Toggle Button */
+.theme-switch-btn {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-light);
+  color: var(--text-main);
+  padding: 7px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+.theme-switch-btn:hover {
+  border-color: var(--cyan-ice);
+  transform: translateY(-1px);
+}
+.theme-switch-icon {
+  font-size: 14px;
+  display: inline-block;
+  transition: transform var(--transition-normal);
+}
+
+.live-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--badge-green-text);
+  background: var(--badge-green-bg);
+  border: 1px solid var(--badge-green-border);
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-weight: 600;
+}
+.pulse-dot {
+  width: 7px;
+  height: 7px;
+  background: var(--emerald-green);
+  border-radius: 50%;
+  animation: pulseDot 1.8s infinite;
+}
+@keyframes pulseDot {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+  70% { transform: scale(1.1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+/* ========================================================
+   MAIN CONTENT & TAB VIEWS
+======================================================== */
+main {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+.view-section {
+  display: none;
+  width: 100%;
+  height: calc(100vh - 68px);
+  overflow-y: auto;
+}
+.view-section.active {
+  display: flex;
+}
+
+/* ========================================================
+   TAB 1: AI BOOKING AGENT (CONVERSATIONAL EXECUTIVE)
+======================================================== */
+.ai-agent-layout {
+  display: flex;
+  width: 100%;
+  height: 100%;
+}
+
+.chat-workspace {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-body);
+  border-right: 1px solid var(--border-light);
+  height: 100%;
+  position: relative;
+}
+
+/* Workspace Sub-header */
+.chat-banner {
+  padding: 12px 24px;
+  background: var(--bg-header);
+  border-bottom: 1px solid var(--border-light);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.agent-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.agent-pfp {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #0047BA, #38BDF8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  box-shadow: 0 2px 10px rgba(56, 189, 248, 0.3);
+}
+.agent-meta-info h3 {
+  font-family: var(--font-heading);
+  font-size: 15px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-main);
+}
+.agent-meta-info p {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* Chat Messages */
+.chat-scroll-area {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.chat-row {
+  display: flex;
+  gap: 12px;
+  max-width: 86%;
+  animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.chat-row.user {
+  align-self: flex-end;
+  flex-direction: row-reverse;
+}
+.chat-row.agent {
+  align-self: flex-start;
+}
+
+.chat-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+.chat-row.agent .chat-avatar {
+  background: linear-gradient(135deg, #0047BA, #38BDF8);
+  color: #fff;
+}
+.chat-row.user .chat-avatar {
+  background: var(--border-strong);
+  color: var(--text-main);
+}
+
+.chat-bubble {
+  padding: 16px 20px;
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  line-height: 1.65;
+  box-shadow: var(--card-shadow);
+}
+.chat-row.user .chat-bubble {
+  background: var(--chat-user-bg);
+  color: #FFFFFF;
+  border-bottom-right-radius: 3px;
+}
+.chat-row.agent .chat-bubble {
+  background: var(--chat-agent-bg);
+  color: var(--text-main);
+  border: 1px solid var(--chat-agent-border);
+  border-bottom-left-radius: 3px;
+}
+
+.chat-bubble p { margin-bottom: 10px; }
+.chat-bubble p:last-child { margin-bottom: 0; }
+.chat-bubble strong { font-weight: 700; color: inherit; }
+.chat-bubble ul { margin: 8px 0 8px 18px; }
+.chat-bubble li { margin-bottom: 4px; }
+
+/* Thinking Indicator */
+.thought-box {
+  background: var(--badge-cyan-bg);
+  border: 1px dashed var(--badge-cyan-border);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  color: var(--badge-cyan-text);
+  font-family: var(--font-mono);
+}
+.spinner-ring {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(56, 189, 248, 0.25);
+  border-top-color: var(--cyan-ice);
+  border-radius: 50%;
+  animation: spinRing 0.8s linear infinite;
+}
+@keyframes spinRing { to { transform: rotate(360deg); } }
+
+/* ========================================================
+   FACILITIES COMPARISON CARDS IN CHAT
+======================================================== */
+.matching-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 14px;
+}
+@media (max-width: 950px) {
+  .matching-grid { grid-template-columns: 1fr; }
+}
+
+.facility-comparison-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: all var(--transition-fast);
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--card-shadow);
+}
+.facility-comparison-card:hover {
+  border-color: var(--cyan-ice);
+  transform: translateY(-2px);
+  box-shadow: var(--glow);
+}
+.facility-comparison-card.is-best-match {
+  border-color: var(--cyan-ice);
+  background: linear-gradient(180deg, var(--bg-card), var(--bg-surface));
+}
+.facility-comparison-card.is-best-match::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #38BDF8, #10B981);
+}
+
+.fcc-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+.fcc-title {
+  font-family: var(--font-heading);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-main);
+}
+.fcc-sub {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.fcc-badge {
+  font-size: 10px;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.fcc-badge.match {
+  background: var(--badge-cyan-bg);
+  border: 1px solid var(--badge-cyan-border);
+  color: var(--badge-cyan-text);
+}
+.fcc-badge.price {
+  background: var(--badge-green-bg);
+  border: 1px solid var(--badge-green-border);
+  color: var(--badge-green-text);
+}
+
+.fcc-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  background: var(--bg-surface);
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-light);
+}
+.fcc-stat-item span {
+  font-size: 10px;
+  color: var(--text-dim);
+  display: block;
+}
+.fcc-stat-item strong {
+  font-size: 13px;
+  color: var(--text-main);
+}
+
+.fcc-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.fcc-pill {
+  font-size: 10px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-light);
+  padding: 2px 7px;
+  border-radius: 4px;
+  color: var(--text-muted);
+}
+.fcc-pill.verified {
+  color: var(--badge-green-text);
+  border-color: var(--badge-green-border);
+  background: var(--badge-green-bg);
+}
+
+.fcc-buttons {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+.btn-primary-action {
+  flex: 1;
+  background: var(--blue-primary);
+  color: #FFFFFF;
+  border: none;
+  padding: 9px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.btn-primary-action:hover {
+  background: var(--blue-hover);
+  box-shadow: 0 4px 12px rgba(0, 71, 186, 0.4);
+}
+.btn-secondary-action {
+  background: var(--bg-surface);
+  color: var(--text-main);
+  border: 1px solid var(--border-light);
+  padding: 9px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+.btn-secondary-action:hover {
+  border-color: var(--border-strong);
+  background: var(--bg-card-hover);
+}
+
+/* ========================================================
+   QUICK PROMPTS BAR
+======================================================== */
+.quick-chips-wrapper {
+  padding: 10px 24px;
+  background: var(--bg-header);
+  border-top: 1px solid var(--border-light);
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+}
+.quick-chip {
+  white-space: nowrap;
+  font-size: 11px;
+  font-weight: 600;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-light);
+  color: var(--text-muted);
+  padding: 6px 12px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.quick-chip:hover {
+  color: var(--text-accent);
+  border-color: var(--border-cyan);
+  background: var(--badge-cyan-bg);
+  transform: translateY(-1px);
+}
+.quick-chip.highlighted {
+  background: var(--badge-cyan-bg);
+  border-color: var(--border-cyan);
+  color: var(--text-accent);
+  font-weight: 700;
+}
+
+/* ========================================================
+   CHAT INPUT BAR
+======================================================== */
+.chat-input-container {
+  padding: 16px 24px;
+  background: var(--bg-card);
+  border-top: 1px solid var(--border-light);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.input-field-box {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.chat-text-input {
+  width: 100%;
+  background: var(--bg-input);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  padding: 14px 48px 14px 18px;
+  color: var(--text-main);
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+.chat-text-input:focus {
+  border-color: var(--border-focus);
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.2);
+}
+.btn-mic-icon {
+  position: absolute;
+  right: 14px;
+  background: transparent;
+  border: none;
+  color: var(--text-dim);
+  cursor: pointer;
+  font-size: 18px;
+  transition: color var(--transition-fast);
+}
+.btn-mic-icon:hover { color: var(--cyan-ice); }
+.btn-mic-icon.active-recording { color: var(--rose-danger); animation: pulseDot 1s infinite; }
+
+.btn-send-message {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  background: var(--blue-primary);
+  border: none;
+  color: #FFFFFF;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 14px rgba(0, 71, 186, 0.35);
+  transition: all var(--transition-fast);
+}
+.btn-send-message:hover {
+  background: var(--blue-hover);
+  transform: scale(1.04);
+}
+
+/* ========================================================
+   RIGHT DRAWER: TRANSACTION INTELLIGENCE
+======================================================== */
+.agent-intelligence-drawer {
+  width: 380px;
+  background: var(--bg-drawer);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  border-left: 1px solid var(--border-light);
+  transition: background-color var(--transition-normal);
+}
+@media (max-width: 1100px) {
+  .agent-intelligence-drawer { display: none; }
+}
+
+.drawer-top {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-light);
+  font-family: var(--font-heading);
+  font-size: 13px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.drawer-body {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.drawer-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  padding: 16px;
+}
+.dc-title {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+  font-weight: 700;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Stepper */
+.stepper-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.stepper-item {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  position: relative;
+}
+.stepper-item:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  top: 22px;
+  left: 11px;
+  width: 2px;
+  height: calc(100% - 10px);
+  background: var(--border-light);
+}
+.stepper-item.completed:not(:last-child)::after {
+  background: var(--emerald-green);
+}
+.step-number {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--bg-card);
+  border: 1px solid var(--border-strong);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-dim);
+  z-index: 1;
+}
+.stepper-item.active .step-number {
+  background: var(--blue-primary);
+  border-color: var(--cyan-ice);
+  color: #fff;
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
+}
+.stepper-item.completed .step-number {
+  background: var(--emerald-green);
+  border-color: var(--emerald-green);
+  color: #fff;
+}
+.step-details h5 {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-main);
+}
+.step-details p {
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+/* SLA Guarantee Box */
+.sla-guarantee-card {
+  background: linear-gradient(135deg, var(--badge-green-bg), var(--badge-cyan-bg));
+  border: 1px solid var(--badge-green-border);
+  border-radius: var(--radius-md);
+  padding: 14px;
+}
+.sla-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  margin-bottom: 8px;
+}
+.sla-line:last-child { margin-bottom: 0; }
+.sla-line span { color: var(--text-muted); }
+.sla-line strong { color: var(--badge-green-text); }
+
+/* ========================================================
+   TAB 2: VERIFIED FACILITY EXPLORER
+======================================================== */
+.explorer-layout {
+  padding: 24px 32px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.filter-toolbar {
+  display: flex;
+  gap: 12px;
+  background: var(--bg-card);
+  padding: 16px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-light);
+  align-items: center;
+  flex-wrap: wrap;
+  box-shadow: var(--card-shadow);
+}
+.filter-search-box {
+  flex: 1;
+  min-width: 240px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-light);
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  color: var(--text-main);
+  font-size: 13px;
+  outline: none;
+}
+.filter-dropdown {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-light);
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  color: var(--text-main);
+  font-size: 13px;
+  outline: none;
+}
+
+.facilities-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 18px;
+}
+.facility-grid-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  transition: all var(--transition-fast);
+  box-shadow: var(--card-shadow);
+}
+.facility-grid-card:hover {
+  border-color: var(--border-cyan);
+  transform: translateY(-2px);
+  box-shadow: var(--glow);
+}
+.fgc-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+.fgc-title {
+  font-family: var(--font-heading);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-main);
+}
+.fgc-location {
+  font-size: 12px;
+  color: var(--text-accent);
+}
+.fgc-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  font-size: 12px;
+  background: var(--bg-surface);
+  padding: 10px;
+  border-radius: var(--radius-sm);
+}
+.fgc-grid div span { color: var(--text-dim); display: block; font-size: 10px; }
+.fgc-grid div strong { color: var(--text-main); font-size: 13px; }
+
+/* ========================================================
+   TAB 3: ACTIVE BOOKINGS & IoT TELEMETRY
+======================================================== */
+.bookings-layout {
+  padding: 24px 32px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+.kpi-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+@media (max-width: 900px) {
+  .kpi-row { grid-template-columns: 1fr 1fr; }
+}
+.kpi-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  padding: 18px;
+  box-shadow: var(--card-shadow);
+}
+.kpi-card span { font-size: 12px; color: var(--text-muted); }
+.kpi-card strong { font-size: 24px; font-family: var(--font-heading); color: var(--text-main); display: block; margin-top: 4px; }
+
+.booking-telemetry-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  box-shadow: var(--card-shadow);
+}
+.btc-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border-light);
+  padding-bottom: 14px;
+}
+.btc-head h4 {
+  font-size: 17px;
+  font-family: var(--font-heading);
+  color: var(--text-main);
+}
+.btc-head p {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+.telemetry-split {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 20px;
+}
+@media (max-width: 900px) {
+  .telemetry-split { grid-template-columns: 1fr; }
+}
+.telemetry-chart-container {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.sensor-bar-chart {
+  height: 120px;
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  padding-top: 10px;
+}
+.sensor-bar {
+  flex: 1;
+  background: linear-gradient(180deg, #38BDF8, #0047BA);
+  border-radius: 3px 3px 0 0;
+  position: relative;
+  transition: height 0.3s ease;
+}
+.sensor-bar:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  top: -24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #0F172A;
+  color: #FFF;
+  font-size: 10px;
+  padding: 2px 5px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+/* ========================================================
+   MODALS
+======================================================== */
+.modal-backdrop-layer {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: var(--modal-backdrop);
+  backdrop-filter: blur(8px);
+  z-index: 200;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.modal-backdrop-layer.show { display: flex; }
+
+.modal-dialog {
+  background: var(--bg-card);
+  border: 1px solid var(--border-cyan);
+  border-radius: var(--radius-lg);
+  width: 100%;
+  max-width: 580px;
+  box-shadow: 0 16px 50px rgba(0, 0, 0, 0.5), var(--glow);
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: modalIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes modalIn {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.modal-title-bar {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border-light);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.modal-heading { font-family: var(--font-heading); font-size: 18px; font-weight: 700; color: var(--text-main); }
+.btn-close-modal { background: transparent; border: none; color: var(--text-dim); font-size: 20px; cursor: pointer; }
+.btn-close-modal:hover { color: var(--text-main); }
+
+.modal-inner-body {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.form-field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.form-field-group label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+.form-control-input {
+  background: var(--bg-input);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  color: var(--text-main);
+  font-size: 13px;
+  outline: none;
+}
+.form-control-input:focus { border-color: var(--border-focus); }
+
+.cost-breakdown-box {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 13px;
+}
+.cb-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.cb-row.grand-total {
+  border-top: 1px dashed var(--border-strong);
+  padding-top: 8px;
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--badge-green-text);
+}
+
+.modal-actions-bar {
+  padding: 18px 24px;
+  border-top: 1px solid var(--border-light);
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+/* Print View */
+@media print {
+  body * { visibility: hidden; }
+  #voucherModal, #voucherModal * { visibility: visible; }
+  #voucherModal { position: absolute; left: 0; top: 0; width: 100%; height: 100%; background: #fff !important; color: #000 !important; }
+}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR HEADER -->
+<header>
+  <div class="brand-section" onclick="switchView('agent')">
+    <div class="brand-logo">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+      </svg>
+    </div>
+    <div>
+      <div style="display:flex; align-items:center; gap:8px;">
+        <span class="brand-title">ColdChainX</span>
+        <span class="brand-pill">AI Booking Agent</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- NAVIGATION TABS -->
+  <nav class="nav-tabs">
+    <button class="nav-tab active" onclick="switchView('agent')">
+      <span>🤖</span> AI Booking Agent
+    </button>
+    <button class="nav-tab" onclick="switchView('explorer')">
+      <span>🏭</span> Facility Explorer (101)
+    </button>
+    <button class="nav-tab" onclick="switchView('bookings')">
+      <span>📋</span> Active Bookings & IoT
+    </button>
+    <button class="nav-tab" onclick="switchView('fleet')">
+      <span>🚚</span> Reefer Logistics
+    </button>
+  </nav>
+
+  <!-- HEADER ACTIONS (THEME TOGGLE & STATUS) -->
+  <div class="header-actions">
+    <!-- Dark / Light Theme Toggle -->
+    <button class="theme-switch-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Switch between Dark and Light mode">
+      <span class="theme-switch-icon" id="themeIcon">☀️</span>
+      <span id="themeLabel">Light</span>
+    </button>
+
+    <div class="live-indicator">
+      <div class="pulse-dot"></div>
+      <span>24/7 Agent Online</span>
+    </div>
+  </div>
+</header>
+
+<main>
+  <!-- TAB 1: AI BOOKING EXECUTIVE CHAT (FLAGSHIP INTERFACE) -->
+  <section id="view-agent" class="view-section active">
+    <div class="ai-agent-layout">
+      
+      <!-- Left Workspace / Chat -->
+      <div class="chat-workspace">
+        
+        <!-- Banner -->
+        <div class="chat-banner">
+          <div class="agent-meta">
+            <div class="agent-pfp">❄️</div>
+            <div class="agent-meta-info">
+              <h3>ColdChainX Booking Executive <span class="brand-pill">Google Cloud Ecosystem</span></h3>
+              <p>Autonomous requirement analysis, capacity reservation, dynamic negotiation & instant booking</p>
+            </div>
+          </div>
+          <div>
+            <button class="btn-secondary-action" onclick="resetChat()" style="font-size:11px; padding:6px 10px;">
+              🔄 Reset Session
+            </button>
+          </div>
+        </div>
+
+        <!-- Chat History -->
+        <div class="chat-scroll-area" id="chatMessages">
+          <div class="chat-row agent">
+            <div class="chat-avatar">❄️</div>
+            <div class="chat-bubble">
+              <p>Hello! I am your <strong>24/7 ColdChainX AI Booking Executive</strong>.</p>
+              <p>Instead of manually calling vendors or negotiating storage contracts, simply describe your cold storage requirements (product, quantity, temperature, location, duration), and I will:</p>
+              <ul>
+                <li>Scan 100+ verified cold storage facilities in real time</li>
+                <li>Match temperature ranges, pallet/MT capacity & docking equipment</li>
+                <li>Compare rates, negotiate volume discounts & verify FSSAI/HACCP compliance</li>
+                <li>Reserve your chamber and initiate instant booking confirmation</li>
+              </ul>
+              <p>How can I assist your supply chain today?</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Prompts Bar -->
+        <div class="quick-chips-wrapper">
+          <div class="quick-chip highlighted" onclick="useQuickPrompt('I need 100 MT of frozen storage at -18°C near Bengaluru for 30 days.')">
+            ✨ Scenario: 100 MT Frozen French Fries @ -18°C (Bengaluru)
+          </div>
+          <div class="quick-chip" onclick="useQuickPrompt('Need 50 MT cold storage for dairy paneer at 2-4°C near Mysore for 45 days')">
+            🥛 Dairy: 50 MT @ 2-4°C (Mysore)
+          </div>
+          <div class="quick-chip" onclick="useQuickPrompt('Looking for 80 MT deep frozen seafood storage at -25°C near Chennai port with reefer transport')">
+            🦐 Seafood: 80 MT @ -25°C (Chennai)
+          </div>
+          <div class="quick-chip" onclick="useQuickPrompt('Search pharma vaccine cold chain at 2-8°C with FSSAI, ISO & power backup in Mumbai')">
+            💊 Pharma: Vaccines @ 2-8°C (Mumbai)
+          </div>
+        </div>
+
+        <!-- Chat Input Bar -->
+        <div class="chat-input-container">
+          <div class="input-field-box">
+            <input type="text" id="chatInput" class="chat-text-input" placeholder="Type your storage requirement (e.g. 'I need 100 MT of frozen storage at -18°C near Bengaluru for 30 days')..." onkeydown="if(event.key==='Enter') sendMessage()">
+            <button class="btn-mic-icon" id="micBtn" onclick="toggleSpeech()" title="Simulate voice input">🎙️</button>
+          </div>
+          <button class="btn-send-message" onclick="sendMessage()" title="Send">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="22" y1="2" x2="11" y2="13"></line>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+            </svg>
+          </button>
+        </div>
+
+      </div>
+
+      <!-- Right Drawer: Transaction Pipeline & Intelligence -->
+      <aside class="agent-intelligence-drawer">
+        <div class="drawer-top">
+          <span>AI AGENT LIFECYCLE</span>
+          <span style="font-size:11px; color:var(--text-accent);">⚡ Autonomous Agent</span>
+        </div>
+        <div class="drawer-body">
+
+          <!-- 4-Step Pipeline -->
+          <div class="drawer-card">
+            <div class="dc-title">
+              <span>Transaction Pipeline</span>
+              <span id="wfProgress" style="color:var(--text-accent)">Step 1/4</span>
+            </div>
+            <div class="stepper-list">
+              <div class="stepper-item completed" id="wfStep1">
+                <div class="step-number">1</div>
+                <div class="step-details">
+                  <h5>Requirement Extraction</h5>
+                  <p>Product, Temp, MT & City coordinates</p>
+                </div>
+              </div>
+              <div class="stepper-item active" id="wfStep2">
+                <div class="step-number">2</div>
+                <div class="step-details">
+                  <h5>Facility Matching & Audit</h5>
+                  <p>Distance, capacity, FSSAI & rate compare</p>
+                </div>
+              </div>
+              <div class="stepper-item" id="wfStep3">
+                <div class="step-number">3</div>
+                <div class="step-details">
+                  <h5>Dynamic Negotiation</h5>
+                  <p>Volume discount & chamber lock-in</p>
+                </div>
+              </div>
+              <div class="stepper-item" id="wfStep4">
+                <div class="step-number">4</div>
+                <div class="step-details">
+                  <h5>Booking Execution</h5>
+                  <p>Chamber PIN, Escrow lock & IoT pass</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Active Requirements Summary -->
+          <div class="drawer-card">
+            <div class="dc-title">
+              <span>Current Extraction</span>
+              <span style="font-size:10px; color:var(--badge-green-text);">Auto-Parsed</span>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:8px; font-size:12px;">
+              <div style="display:flex; justify-content:space-between;"><span style="color:var(--text-dim)">Commodity:</span><strong id="drCommodity">Frozen French Fries</strong></div>
+              <div style="display:flex; justify-content:space-between;"><span style="color:var(--text-dim)">Volume / Mass:</span><strong id="drVolume">100 MT (~180 Pallets)</strong></div>
+              <div style="display:flex; justify-content:space-between;"><span style="color:var(--text-dim)">Temperature:</span><strong id="drTemp" style="color:var(--text-accent)">-18°C (Frozen)</strong></div>
+              <div style="display:flex; justify-content:space-between;"><span style="color:var(--text-dim)">Storage Duration:</span><strong id="drDuration">30 Days</strong></div>
+              <div style="display:flex; justify-content:space-between;"><span style="color:var(--text-dim)">Search Radius:</span><strong id="drRadius">Within 50 km (Bengaluru)</strong></div>
+              <div style="display:flex; justify-content:space-between;"><span style="color:var(--text-dim)">Compliance:</span><strong style="color:var(--badge-green-text)">FSSAI • DG Backup • CCTV</strong></div>
+            </div>
+          </div>
+
+          <!-- SLA Box -->
+          <div class="sla-guarantee-card">
+            <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+              <span style="font-size:16px;">🛡️</span>
+              <strong style="font-size:13px; color:var(--text-main);">ColdChainX IoT SLA Guarantee</strong>
+            </div>
+            <p style="font-size:11px; color:var(--text-muted); line-height:1.5; margin-bottom:10px;">
+              Continuous 24/7 IoT temperature recording. Real-time alerts if temperature deviates by > ±0.5°C with automatic escrow compensation.
+            </p>
+            <div class="sla-line">
+              <span>Temperature SLA:</span>
+              <strong>±0.5°C Strict Hold</strong>
+            </div>
+            <div class="sla-line">
+              <span>Power Backup:</span>
+              <strong>100% DG Failover</strong>
+            </div>
+            <div class="sla-line">
+              <span>Inward Authorization:</span>
+              <strong>Instant QR Pass</strong>
+            </div>
+          </div>
+
+        </div>
+      </aside>
+
+    </div>
+  </section>
+
+  <!-- TAB 2: VERIFIED FACILITY EXPLORER (101 FACILITIES) -->
+  <section id="view-explorer" class="view-section">
+    <div class="explorer-layout">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <h2 style="font-family:var(--font-heading); font-size:22px; font-weight:700;">Verified Cold Storage Directory</h2>
+          <p style="font-size:13px; color:var(--text-muted);">101 on-boarded facilities with live capacity and compliance audits</p>
+        </div>
+        <div>
+          <button class="btn-primary-action" onclick="switchView('agent'); useQuickPrompt('Show me the best facilities in Bangalore');">
+            🤖 Ask AI to Match
+          </button>
+        </div>
+      </div>
+
+      <!-- Filters -->
+      <div class="filter-toolbar">
+        <input type="text" id="expSearch" class="filter-search-box" placeholder="Search by name, city, address, or ID..." oninput="filterExplorer()">
+        <select id="expCity" class="filter-dropdown" onchange="filterExplorer()">
+          <option value="">All Cities</option>
+          <option value="Bangalore">Bangalore</option>
+          <option value="Mysore">Mysore</option>
+          <option value="Hosur">Hosur</option>
+          <option value="Chennai">Chennai</option>
+          <option value="Coimbatore">Coimbatore</option>
+          <option value="Mumbai">Mumbai</option>
+          <option value="Pune">Pune</option>
+          <option value="Ahmedabad">Ahmedabad</option>
+          <option value="Hyderabad">Hyderabad</option>
+          <option value="Kochi">Kochi</option>
+          <option value="Gurugram">Gurugram / Delhi</option>
+        </select>
+        <select id="expTemp" class="filter-dropdown" onchange="filterExplorer()">
+          <option value="">All Temperatures</option>
+          <option value="Frozen">Frozen (-18°C or below)</option>
+          <option value="Chilled">Chilled (0°C to 4°C)</option>
+          <option value="Deep Frozen">Deep Frozen (-25°C)</option>
+          <option value="Ambient">Ambient Controlled (15°C to 25°C)</option>
+          <option value="Multi-Temp">Multi-Temperature</option>
+        </select>
+        <select id="expMinCap" class="filter-dropdown" onchange="filterExplorer()">
+          <option value="">Min Capacity</option>
+          <option value="50">50+ MT</option>
+          <option value="100">100+ MT</option>
+          <option value="250">250+ MT</option>
+          <option value="500">500+ MT</option>
+        </select>
+      </div>
+
+      <!-- Grid -->
+      <div class="facilities-cards-grid" id="facilitiesGrid"></div>
+    </div>
+  </section>
+
+  <!-- TAB 3: ACTIVE BOOKINGS & IoT TELEMETRY -->
+  <section id="view-bookings" class="view-section">
+    <div class="bookings-layout">
+      <div>
+        <h2 style="font-family:var(--font-heading); font-size:22px; font-weight:700;">Storage Lifecycle & IoT Telemetry Tower</h2>
+        <p style="font-size:13px; color:var(--text-muted);">Real-time chamber telemetry, inventory control, and digital gate passes</p>
+      </div>
+
+      <!-- KPI Row -->
+      <div class="kpi-row">
+        <div class="kpi-card">
+          <span>Active Bookings</span>
+          <strong id="statActiveCount">2</strong>
+        </div>
+        <div class="kpi-card">
+          <span>Total Mass in Storage</span>
+          <strong id="statMassCount">230 MT</strong>
+        </div>
+        <div class="kpi-card">
+          <span>Average Chamber Temp</span>
+          <strong style="color:var(--text-accent)">-18.3°C</strong>
+        </div>
+        <div class="kpi-card">
+          <span>SLA Adherence</span>
+          <strong style="color:var(--badge-green-text)">99.9%</strong>
+        </div>
+      </div>
+
+      <!-- Booking List with Telemetry -->
+      <div id="bookingsList" style="display:flex; flex-direction:column; gap:18px;"></div>
+    </div>
+  </section>
+
+  <!-- TAB 4: REEFER FLEET LOGISTICS -->
+  <section id="view-fleet" class="view-section">
+    <div class="explorer-layout">
+      <div>
+        <h2 style="font-family:var(--font-heading); font-size:22px; font-weight:700;">ColdChainX Reefer Logistics Network</h2>
+        <p style="font-size:13px; color:var(--text-muted);">Temperature-controlled GPS/IoT reefer trucks connected to our onboarded facilities</p>
+      </div>
+
+      <div class="facilities-cards-grid" id="fleetGrid"></div>
+    </div>
+  </section>
+</main>
+
+<!-- BOOKING AUTHORIZATION MODAL -->
+<div class="modal-backdrop-layer" id="bookingModal">
+  <div class="modal-dialog">
+    <div class="modal-title-bar">
+      <div class="modal-heading">Authorize Cold Storage Booking</div>
+      <button class="btn-close-modal" onclick="closeModal('bookingModal')">✕</button>
+    </div>
+    <div class="modal-inner-body">
+      <div style="background:var(--badge-cyan-bg); border:1px solid var(--badge-cyan-border); border-radius:8px; padding:12px; font-size:12px; color:var(--badge-cyan-text); display:flex; align-items:center; gap:8px;">
+        <span>🔒</span>
+        <span>Chamber capacity reserved for 15 minutes while completing transaction</span>
+      </div>
+
+      <div class="form-field-group">
+        <label>Selected Facility</label>
+        <input type="text" id="bmFacility" class="form-control-input" readonly value="Facility A (Cold Storage 01)">
+      </div>
+
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+        <div class="form-field-group">
+          <label>Commodity</label>
+          <input type="text" id="bmCommodity" class="form-control-input" value="Frozen French Fries">
+        </div>
+        <div class="form-field-group">
+          <label>Required Mass (MT)</label>
+          <input type="number" id="bmQuantity" class="form-control-input" value="100" readonly>
+        </div>
+      </div>
+
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+        <div class="form-field-group">
+          <label>Target Temperature</label>
+          <input type="text" id="bmTemp" class="form-control-input" value="-18°C" readonly>
+        </div>
+        <div class="form-field-group">
+          <label>Storage Duration</label>
+          <input type="text" id="bmDuration" class="form-control-input" value="30 Days" readonly>
+        </div>
+      </div>
+
+      <div class="form-field-group">
+        <label>Company / Producer Name</label>
+        <input type="text" id="bmCompany" class="form-control-input" value="McCain / Global Foods Ltd">
+      </div>
+
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+        <div class="form-field-group">
+          <label>Authorized Signatory Phone</label>
+          <input type="text" id="bmPhone" class="form-control-input" value="9845012300">
+        </div>
+        <div class="form-field-group">
+          <label>GSTIN / Tax ID</label>
+          <input type="text" id="bmGstin" class="form-control-input" value="29AAAAA0000A1Z5">
+        </div>
+      </div>
+
+      <!-- Cost Breakdown -->
+      <div class="cost-breakdown-box">
+        <div class="cb-row">
+          <span style="color:var(--text-muted)">Storage Rent (100 MT × ₹1,200/mo × 1 mo):</span>
+          <strong id="bmRent">₹1,20,000</strong>
+        </div>
+        <div class="cb-row">
+          <span style="color:var(--text-muted)">Handling & Inward Unloading:</span>
+          <strong id="bmHandling">₹16,000</strong>
+        </div>
+        <div class="cb-row">
+          <span style="color:var(--text-muted)">GST (18%):</span>
+          <strong id="bmGst">₹24,480</strong>
+        </div>
+        <div class="cb-row grand-total">
+          <span>Total Authorized Amount:</span>
+          <strong id="bmTotal" style="font-size:16px;">₹1,60,480</strong>
+        </div>
+      </div>
+
+      <div class="form-field-group">
+        <label>Payment & Escrow Method</label>
+        <select id="bmPaymentMethod" class="form-control-input">
+          <option>ColdChainX Escrow Guarantee (UPI / NetBanking)</option>
+          <option>Corporate Credit Line (30 Days Credit)</option>
+          <option>Advance Token Authorization (10% Token ₹16,048)</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-actions-bar">
+      <button class="btn-secondary-action" onclick="closeModal('bookingModal')">Cancel</button>
+      <button class="btn-primary-action" style="padding:10px 20px;" onclick="confirmBookingTransaction()">
+        💳 Authorize & Complete Booking
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- BOOKING CONFIRMATION & DIGITAL GATE PASS VOUCHER -->
+<div class="modal-backdrop-layer" id="voucherModal">
+  <div class="modal-dialog" style="max-width:620px;">
+    <div class="modal-title-bar" style="background:linear-gradient(90deg, #0047BA, #0E223D); color:#fff;">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <span style="font-size:24px;">🎉</span>
+        <div>
+          <div class="modal-heading" style="color:#fff;">Booking Confirmation & Gate Pass</div>
+          <p style="font-size:11px; color:var(--cyan-ice);">ColdChainX Digital Inward Certificate</p>
+        </div>
+      </div>
+      <button class="btn-close-modal" style="color:#fff;" onclick="closeModal('voucherModal')">✕</button>
+    </div>
+    <div class="modal-inner-body" id="voucherPrintArea">
+      
+      <!-- Top Certificate Banner -->
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; border-bottom:1px solid var(--border-light); padding-bottom:14px;">
+        <div>
+          <div style="font-size:11px; color:var(--text-dim); text-transform:uppercase;">Official Booking ID</div>
+          <div id="vcBookingId" style="font-family:var(--font-mono); font-size:20px; font-weight:800; color:var(--text-accent);">CCX-BK-2026-1083</div>
+          <div style="font-size:11px; color:var(--badge-green-text); margin-top:2px;">● Verified & Escrow Guaranteed</div>
+        </div>
+        <div style="text-align:right;">
+          <div style="background:#fff; padding:6px; border-radius:6px; display:inline-block; border:1px solid #CBD5E1;">
+            <svg width="60" height="60" viewBox="0 0 100 100">
+              <rect x="5" y="5" width="30" height="30" fill="#000" />
+              <rect x="10" y="10" width="20" height="20" fill="#fff" />
+              <rect x="65" y="5" width="30" height="30" fill="#000" />
+              <rect x="70" y="10" width="20" height="20" fill="#fff" />
+              <rect x="5" y="65" width="30" height="30" fill="#000" />
+              <rect x="10" y="70" width="20" height="20" fill="#fff" />
+              <rect x="42" y="20" width="16" height="16" fill="#000" />
+              <rect x="42" y="65" width="20" height="20" fill="#000" />
+              <rect x="70" y="50" width="15" height="35" fill="#000" />
+            </svg>
+          </div>
+          <div style="font-size:10px; color:var(--text-dim); margin-top:2px;">Scan at Inward Gate</div>
+        </div>
+      </div>
+
+      <!-- Facility & Allocation Details -->
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:14px; background:var(--bg-surface); padding:14px; border-radius:8px; border:1px solid var(--border-light);">
+        <div>
+          <span style="font-size:11px; color:var(--text-dim);">Assigned Facility</span>
+          <strong id="vcFacility" style="display:block; font-size:14px; color:var(--text-main);">Cold Storage 01</strong>
+          <p id="vcAddress" style="font-size:11px; color:var(--text-muted); margin-top:2px;">Electronic City Phase-1, Bangalore</p>
+        </div>
+        <div>
+          <span style="font-size:11px; color:var(--text-dim);">Chamber Allocated</span>
+          <strong id="vcChamber" style="display:block; font-size:14px; color:var(--text-accent);">Chamber 2 (Rack B-10 to B-28)</strong>
+          <p style="font-size:11px; color:var(--badge-green-text); margin-top:2px;">Temperature Setpoint: -18.0°C</p>
+        </div>
+      </div>
+
+      <!-- Commodity & Financial Breakdown -->
+      <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:10px;">
+        <div style="background:var(--bg-surface); padding:10px; border-radius:6px; border:1px solid var(--border-light);">
+          <span style="font-size:10px; color:var(--text-dim);">Commodity</span>
+          <strong id="vcCommodity" style="display:block; font-size:12px; color:var(--text-main);">French Fries</strong>
+        </div>
+        <div style="background:var(--bg-surface); padding:10px; border-radius:6px; border:1px solid var(--border-light);">
+          <span style="font-size:10px; color:var(--text-dim);">Quantity</span>
+          <strong id="vcQty" style="display:block; font-size:12px; color:var(--text-main);">100 MT (180 Pallets)</strong>
+        </div>
+        <div style="background:var(--bg-surface); padding:10px; border-radius:6px; border:1px solid var(--border-light);">
+          <span style="font-size:10px; color:var(--text-dim);">Total Amount</span>
+          <strong id="vcTotal" style="display:block; font-size:12px; color:var(--badge-green-text);">₹1,60,480</strong>
+        </div>
+      </div>
+
+      <!-- Compliance Seals -->
+      <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--border-light); padding-top:12px;">
+        <div style="display:flex; gap:10px; font-size:11px; color:var(--text-muted);">
+          <span>✅ FSSAI Certified</span>
+          <span>✅ 100% DG Backup</span>
+          <span>✅ IoT Telemetry Live</span>
+        </div>
+        <div style="font-size:11px; color:var(--text-dim);">
+          Node ID: <span id="vcNodeId" style="color:var(--text-accent)">CCX-TN-CS-ID-001</span>
+        </div>
+      </div>
+
+    </div>
+    <div class="modal-actions-bar">
+      <button class="btn-secondary-action" onclick="window.print()">🖨️ Print Pass</button>
+      <button class="btn-primary-action" onclick="closeModal('voucherModal'); switchView('bookings');">
+        📊 View Active Telemetry
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ==========================================
+// THEME SWITCHER LOGIC (DARK & LIGHT MODE)
+// ==========================================
+function initTheme() {
+  const savedTheme = localStorage.getItem("ccx-theme") || "dark";
+  applyTheme(savedTheme);
+}
+
+function applyTheme(theme) {
+  document.documentElement.setAttribute("data-theme", theme);
+  localStorage.setItem("ccx-theme", theme);
+  
+  const icon = document.getElementById("themeIcon");
+  const label = document.getElementById("themeLabel");
+  if (theme === "light") {
+    icon.textContent = "🌙";
+    label.textContent = "Dark";
+  } else {
+    icon.textContent = "☀️";
+    label.textContent = "Light";
+  }
+}
+
+function toggleTheme() {
+  const current = document.documentElement.getAttribute("data-theme") || "dark";
+  const target = (current === "dark") ? "light" : "dark";
+  applyTheme(target);
+}
+
+// ==========================================
+// STATE MANAGEMENT & DATA LOADING
+// ==========================================
+let allFacilities = [];
+let allBookings = [];
+let activeTargetBooking = null;
+
+document.addEventListener("DOMContentLoaded", async () => {
+  initTheme();
+  await fetchFacilities();
+  await fetchBookings();
+  renderFleet();
+});
+
+// View Navigation Switch
+function switchView(tabId) {
+  document.querySelectorAll(".nav-tab").forEach(t => t.classList.remove("active"));
+  document.querySelectorAll(".view-section").forEach(s => s.classList.remove("active"));
+  
+  if (tabId === 'agent') {
+    document.querySelectorAll(".nav-tab")[0].classList.add("active");
+    document.getElementById("view-agent").classList.add("active");
+  } else if (tabId === 'explorer') {
+    document.querySelectorAll(".nav-tab")[1].classList.add("active");
+    document.getElementById("view-explorer").classList.add("active");
+  } else if (tabId === 'bookings') {
+    document.querySelectorAll(".nav-tab")[2].classList.add("active");
+    document.getElementById("view-bookings").classList.add("active");
+    renderBookings();
+  } else if (tabId === 'fleet') {
+    document.querySelectorAll(".nav-tab")[3].classList.add("active");
+    document.getElementById("view-fleet").classList.add("active");
+  }
+}
+
+// Fetch Facilities
+async function fetchFacilities() {
+  try {
+    const res = await fetch("/api/facilities");
+    const data = await res.json();
+    allFacilities = data.facilities || window.EMBEDDED_FACILITIES || [];
+    renderExplorer(allFacilities);
+  } catch (err) {
+    allFacilities = window.EMBEDDED_FACILITIES || [];
+    renderExplorer(allFacilities);
+  }
+}
+
+// Fetch Bookings
+async function fetchBookings() {
+  try {
+    const res = await fetch("/api/bookings");
+    const data = await res.json();
+    allBookings = data.bookings || [];
+    renderBookings();
+  } catch (err) {
+    // Default mock bookings
+    allBookings = [
+      {
+        booking_id: "CCX-BK-2026-1082",
+        facility_name: "Cold Storage 01",
+        customer_name: "ITC Foods Ltd",
+        commodity: "Frozen Snacks & French Fries",
+        quantity_mt: 80,
+        target_temp: "-18°C",
+        chamber_allocated: "Chamber 2 (Rack B-04 to B-18)",
+        live_temp: -18.4,
+        humidity: 88,
+        total_amount: 188800
+      },
+      {
+        booking_id: "CCX-BK-2026-1049",
+        facility_name: "Cold Storage 02",
+        customer_name: "MilkyMist Dairy Co.",
+        commodity: "Paneer & Butter Blocks",
+        quantity_mt: 50,
+        target_temp: "-18°C",
+        chamber_allocated: "Chamber 1 (Rack A-01 to A-12)",
+        live_temp: -18.1,
+        humidity: 85,
+        total_amount: 82010
+      }
+    ];
+    renderBookings();
+  }
+}
+
+// ==========================================
+// CHAT & AI AGENT ENGINE
+// ==========================================
+function appendUserMessage(text) {
+  const container = document.getElementById("chatMessages");
+  const row = document.createElement("div");
+  row.className = "chat-row user";
+  row.innerHTML = `
+    <div class="chat-avatar">👤</div>
+    <div class="chat-bubble"><p>${escapeHtml(text)}</p></div>
+  `;
+  container.appendChild(row);
+  container.scrollTop = container.scrollHeight;
+}
+
+function appendThinkingBox(statusText) {
+  const container = document.getElementById("chatMessages");
+  const thinking = document.createElement("div");
+  thinking.className = "thought-box";
+  thinking.id = "thinkingIndicator";
+  thinking.innerHTML = `
+    <div class="spinner-ring"></div>
+    <span>${statusText}</span>
+  `;
+  container.appendChild(thinking);
+  container.scrollTop = container.scrollHeight;
+}
+
+function removeThinkingBox() {
+  const el = document.getElementById("thinkingIndicator");
+  if (el) el.remove();
+}
+
+async function sendMessage(customText) {
+  const input = document.getElementById("chatInput");
+  const text = customText || input.value.trim();
+  if (!text) return;
+
+  if (!customText) input.value = "";
+  appendUserMessage(text);
+
+  appendThinkingBox("Analyzing 101 verified cold chain facilities against requirements...");
+
+  try {
+    const res = await fetch("/api/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: text, session_id: "user_session" })
+    });
+    const data = await res.json();
+    removeThinkingBox();
+    renderAgentResponse(data);
+  } catch (err) {
+    removeThinkingBox();
+    processClientFallback(text);
+  }
+}
+
+function renderAgentResponse(data) {
+  const container = document.getElementById("chatMessages");
+  const row = document.createElement("div");
+  row.className = "chat-row agent";
+  
+  let formattedText = data.text
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/### (.*?)\n/g, '<h4 style="margin:10px 0 6px 0; color:var(--text-main); font-family:var(--font-heading);">$1</h4>')
+    .replace(/• (.*?)\n/g, '<li>$1</li>')
+    .replace(/\n\n/g, '<br><br>');
+
+  let html = `
+    <div class="chat-avatar">❄️</div>
+    <div class="chat-bubble">
+      <div>${formattedText}</div>
+  `;
+
+  // Render Comparative Facility Cards if provided
+  if (data.matches && data.matches.length > 0) {
+    html += `<div class="matching-grid">`;
+    data.matches.forEach((m, idx) => {
+      const isBest = (idx === 0);
+      html += `
+        <div class="facility-comparison-card ${isBest ? 'is-best-match' : ''}">
+          <div class="fcc-header">
+            <div>
+              <div class="fcc-title">${m.label} — ${m.name}</div>
+              <div class="fcc-sub">${m.address.split(',')[0]} (${m.distance_km} km)</div>
+            </div>
+            <span class="fcc-badge ${isBest ? 'match' : 'price'}">${m.tag}</span>
+          </div>
+
+          <div class="fcc-stats">
+            <div class="fcc-stat-item">
+              <span>Available Capacity</span>
+              <strong>${m.available_mt} MT</strong>
+            </div>
+            <div class="fcc-stat-item">
+              <span>Temperature</span>
+              <strong style="color:var(--text-accent)">${m.temperature}</strong>
+            </div>
+            <div class="fcc-stat-item">
+              <span>Distance</span>
+              <strong>${m.distance_km} km</strong>
+            </div>
+            <div class="fcc-stat-item">
+              <span>Rate / Month</span>
+              <strong style="color:var(--badge-green-text)">₹${m.rate_per_mt.toLocaleString()}/MT</strong>
+            </div>
+          </div>
+
+          <div class="fcc-pills">
+            <span class="fcc-pill verified">✓ FSSAI Certified</span>
+            <span class="fcc-pill verified">✓ 100% Insurance</span>
+            <span class="fcc-pill">⚡ ${m.docks} Covered Docks</span>
+          </div>
+
+          <div class="fcc-buttons">
+            <button class="btn-primary-action" onclick="initiateBooking('${m.id}', '${m.name}', ${m.rate_per_mt})">
+              <span>⚡</span> Book ${m.label}
+            </button>
+            <button class="btn-secondary-action" onclick="sendMessage('Can you get ₹1,100/MT for ${m.label}?')">
+              Negotiate
+            </button>
+          </div>
+        </div>
+      `;
+    });
+    html += `</div>`;
+  }
+
+  // Open booking modal button
+  if (data.action === "open_booking_modal" && data.booking_preview) {
+    html += `
+      <div style="margin-top:14px;">
+        <button class="btn-primary-action" style="width:100%; padding:12px;" onclick="openBookingModalDirectly()">
+          📝 Open Authorized Booking Voucher Summary
+        </button>
+      </div>
+    `;
+    activeTargetBooking = data.booking_preview;
+  }
+
+  html += `</div>`;
+  row.innerHTML = html;
+  container.appendChild(row);
+  container.scrollTop = container.scrollHeight;
+
+  // Update Stepper Pipeline
+  if (data.action === "show_matches") {
+    setWfStep(2);
+  } else if (data.action === "rate_updated") {
+    setWfStep(3);
+  } else if (data.action === "open_booking_modal") {
+    setWfStep(4);
+  }
+}
+
+function setWfStep(stepNum) {
+  document.getElementById("wfProgress").innerText = `Step ${stepNum}/4`;
+  for (let i = 1; i <= 4; i++) {
+    const el = document.getElementById(`wfStep${i}`);
+    el.className = "stepper-item";
+    if (i < stepNum) el.classList.add("completed");
+    else if (i === stepNum) el.classList.add("active");
+  }
+}
+
+function useQuickPrompt(text) {
+  document.getElementById("chatInput").value = text;
+  sendMessage(text);
+}
+
+function resetChat() {
+  document.getElementById("chatMessages").innerHTML = `
+    <div class="chat-row agent">
+      <div class="chat-avatar">❄️</div>
+      <div class="chat-bubble">
+        <p>Session refreshed! What cold chain requirement would you like me to book today?</p>
+      </div>
+    </div>
+  `;
+  setWfStep(1);
+}
+
+// Client Fallback when server is not directly reachable
+function processClientFallback(text) {
+  setTimeout(() => {
+    const textLower = text.toLowerCase();
+    
+    // Check for Proceed / Confirm
+    if (textLower.includes("proceed") || textLower.includes("confirm booking") || textLower.includes("book facility") || textLower.includes("book now") || textLower.includes("yes")) {
+      const targetFac = (window.lastMatched && window.lastMatched[0]) || {
+        id: "CCX-TN-CS-ID-001",
+        name: "Cold Storage 01",
+        address: "Bommasandra Industrial Area, Bangalore",
+        rate_per_mt: 1200,
+        city: "Bangalore",
+        owner: "Sundar",
+        phone: "9090909900"
+      };
+      
+      const qty = window.lastReqQty || 100;
+      const rate = window.lastNegotiatedRate || targetFac.rate_per_mt || 1200;
+      const storageCost = rate * qty;
+      const handling = 16000;
+      const gst = Math.round((storageCost + handling) * 0.18);
+      const total = storageCost + handling + gst;
+
+      renderAgentResponse({
+        text: `🎉 **Booking Confirmation Workflow Initiated!**\n\nI have reserved **${qty} MT** at **${targetFac.name}**.\n\n` +
+              `• **Facility**: ${targetFac.name} (${targetFac.id})\n` +
+              `• **Location**: ${targetFac.address}\n` +
+              `• **Chamber Allocated**: Chamber 2 (Temperature set to -18°C)\n` +
+              `• **Effective Rate**: ₹${rate.toLocaleString()}/MT/month\n` +
+              `• **Total Estimated Cost**: ₹${total.toLocaleString()} (incl. Handling & 18% GST)\n\n` +
+              `Please review the booking summary below and click **'Authorize & Complete Booking'** to generate your official booking certificate and chamber entry pass.`,
+        action: "open_booking_modal",
+        booking_preview: {
+          facility_id: targetFac.id,
+          facility_name: targetFac.name,
+          commodity: window.lastCommodity || "Frozen French Fries",
+          quantity_mt: qty,
+          temperature: "-18°C",
+          duration_days: 30,
+          rate_per_mt: rate,
+          storage_cost: storageCost,
+          handling_cost: handling,
+          gst_amount: gst,
+          total_amount: total,
+          address: targetFac.address,
+          city: targetFac.city || "Bangalore",
+          owner: targetFac.owner || "Sundar",
+          phone: targetFac.phone || "9090909900"
+        }
+      });
+      return;
+    }
+
+    // Check for Negotiation
+    if (textLower.includes("negotiate") || textLower.includes("discount") || textLower.includes("1,100") || textLower.includes("1100") || textLower.includes("cheaper")) {
+      window.lastNegotiatedRate = 1100;
+      renderAgentResponse({
+        text: `🤝 **Dynamic Negotiation Engine Activated**\n\n` +
+              `I reached out to the storage operator system for **Facility A (Cold Storage 01)**.\n\n` +
+              `Based on your commitment of **100 MT** and **30-day duration**, I have unlocked a **special corporate volume rate**:\n\n` +
+              `• **Original Rate**: ~~₹1,200/MT/month~~\n` +
+              `• **Negotiated Rate**: **₹1,100/MT/month** *(Save ₹100/MT/month = ₹10,000 Total)*\n` +
+              `• **ColdChainX Guarantee**: Includes 24/7 IoT temp logging and FSSAI compliance assurance.\n\n` +
+              `Would you like to lock in this negotiated rate and proceed with the booking?`,
+        action: "rate_updated",
+        negotiated_rate: 1100,
+        quick_replies: ["Yes, proceed with Facility A at ₹1,100", "Show other facilities"]
+      });
+      return;
+    }
+
+    // Standard Matching
+    let qty = 100;
+    const qtyMatch = textLower.match(/(\d+)\s*(mt|ton|tonnes)/);
+    if (qtyMatch) qty = parseInt(qtyMatch[1]);
+    window.lastReqQty = qty;
+
+    let commodity = "Frozen French Fries";
+    if (textLower.includes("pharma") || textLower.includes("vaccine")) commodity = "Pharmaceutical Vaccines";
+    else if (textLower.includes("dairy") || textLower.includes("paneer")) commodity = "Dairy Products";
+    else if (textLower.includes("seafood") || textLower.includes("fish") || textLower.includes("shrimp")) commodity = "Frozen Seafood";
+    else if (textLower.includes("apple") || textLower.includes("fruit")) commodity = "Fresh Fruits";
+    window.lastCommodity = commodity;
+
+    const city = textLower.includes("chennai") ? "Chennai" : (textLower.includes("mumbai") ? "Mumbai" : (textLower.includes("mysore") ? "Mysore" : "Bangalore"));
+    const matching = allFacilities.filter(f => f.city && f.city.toLowerCase().includes(city.toLowerCase()));
+    
+    const facA = matching[0] || allFacilities[0] || { name: "Cold Storage 01", id: "CCX-TN-CS-ID-001", address: "Bommasandra Indl Area, Bangalore", available_mt: 120, rate_per_mt_month: 1200, distance_city_km: 18, docks: 4 };
+    const facB = matching[1] || allFacilities[1] || { name: "Cold Storage 02", id: "CCX-TN-CS-ID-002", address: "Nelamangala Logistics Park, Bangalore", available_mt: 150, rate_per_mt_month: 1050, distance_city_km: 32, docks: 6 };
+
+    const matches = [
+      {
+        label: "Facility A",
+        tag: "Best Match",
+        id: facA.id,
+        name: facA.name,
+        available_mt: Math.max(facA.available_mt || 120, 120),
+        temperature: "-18°C",
+        distance_km: facA.distance_city_km || 18,
+        rate_per_mt: facA.rate_per_mt_month || 1200,
+        address: facA.address,
+        docks: facA.docks || 4
+      },
+      {
+        label: "Facility B",
+        tag: "Best Price",
+        id: facB.id,
+        name: facB.name,
+        available_mt: Math.max(facB.available_mt || 150, 150),
+        temperature: "-20°C",
+        distance_km: (facA.distance_city_km || 18) + 14,
+        rate_per_mt: Math.min(facB.rate_per_mt_month || 1050, 1050),
+        address: facB.address,
+        docks: facB.docks || 5
+      }
+    ];
+
+    window.lastMatched = matches;
+
+    renderAgentResponse({
+      text: `Certainly! I have identified suitable verified cold storage facilities within 50 km of **${city}** matching **${qty} MT** of **${commodity}** at **-18°C** for **30 days** with active **FSSAI compliance**, **insurance**, and **loading docks**.\n\n` +
+            `### 🎯 Matching Results:\n\n` +
+            `**1. Facility A — ${matches[0].name} (Best Match)**\n` +
+            `• Available: **${matches[0].available_mt} MT**\n` +
+            `• Temperature: **${matches[0].temperature}**\n` +
+            `• Distance: **${matches[0].distance_km} km**\n` +
+            `• Rate: **₹${matches[0].rate_per_mt.toLocaleString()}/MT/month**\n\n` +
+            `**2. Facility B — ${matches[1].name} (Best Price)**\n` +
+            `• Available: **${matches[1].available_mt} MT**\n` +
+            `• Temperature: **${matches[1].temperature}**\n` +
+            `• Distance: **${matches[1].distance_km} km**\n` +
+            `• Rate: **₹${matches[1].rate_per_mt.toLocaleString()}/MT/month**\n\n` +
+            `💡 **AI Recommendation**:\n` +
+            `**Facility A** offers the closest location (${matches[0].distance_km} km vs ${matches[1].distance_km} km) and meets all your temperature, capacity, and FSSAI requirements. Would you like me to initiate the booking?`,
+      action: "show_matches",
+      matches: matches,
+      recommendation: "Facility A"
+    });
+
+    document.getElementById("drCommodity").innerText = commodity;
+    document.getElementById("drVolume").innerText = `${qty} MT (~${Math.round(qty/0.55)} Pallets)`;
+    document.getElementById("drRadius").innerText = `Within 50 km (${city})`;
+  }, 600);
+}
+
+// Voice Simulation
+function toggleSpeech() {
+  const mic = document.getElementById("micBtn");
+  mic.classList.toggle("active-recording");
+  if (mic.classList.contains("active-recording")) {
+    appendThinkingBox("Listening for voice instructions...");
+    setTimeout(() => {
+      mic.classList.remove("active-recording");
+      removeThinkingBox();
+      useQuickPrompt("I need 100 MT of frozen storage at -18°C near Bengaluru for 30 days.");
+    }, 2200);
+  }
+}
+
+// ==========================================
+// BOOKING AUTHORIZATION & MODAL
+// ==========================================
+function initiateBooking(facilityId, facilityName, rate) {
+  activeTargetBooking = {
+    facility_id: facilityId,
+    facility_name: facilityName,
+    rate_per_mt: rate || 1200,
+    quantity_mt: 100,
+    duration_days: 30,
+    commodity: "Frozen French Fries",
+    temperature: "-18°C"
+  };
+  openBookingModalDirectly();
+}
+
+function openBookingModalDirectly() {
+  const b = activeTargetBooking || {
+    facility_name: "Cold Storage 01 (Facility A)",
+    facility_id: "CCX-TN-CS-ID-001",
+    rate_per_mt: 1200,
+    quantity_mt: 100,
+    commodity: "Frozen French Fries"
+  };
+
+  document.getElementById("bmFacility").value = `${b.facility_name} (${b.facility_id})`;
+  document.getElementById("bmCommodity").value = b.commodity || "Frozen French Fries";
+  document.getElementById("bmQuantity").value = b.quantity_mt || 100;
+  
+  const rate = b.rate_per_mt || 1200;
+  const qty = b.quantity_mt || 100;
+  const storageCost = rate * qty;
+  const handling = 16000;
+  const gst = Math.round((storageCost + handling) * 0.18);
+  const total = storageCost + handling + gst;
+
+  document.getElementById("bmRent").innerText = `₹${storageCost.toLocaleString()}`;
+  document.getElementById("bmHandling").innerText = `₹${handling.toLocaleString()}`;
+  document.getElementById("bmGst").innerText = `₹${gst.toLocaleString()}`;
+  document.getElementById("bmTotal").innerText = `₹${total.toLocaleString()}`;
+
+  document.getElementById("bookingModal").classList.add("show");
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove("show");
+}
+
+async function confirmBookingTransaction() {
+  const b = activeTargetBooking || {};
+  const payload = {
+    facility_id: b.facility_id || "CCX-TN-CS-ID-001",
+    facility_name: b.facility_name || "Cold Storage 01",
+    customer_name: document.getElementById("bmCompany").value,
+    customer_phone: document.getElementById("bmPhone").value,
+    customer_gstin: document.getElementById("bmGstin").value,
+    commodity: document.getElementById("bmCommodity").value,
+    quantity_mt: parseInt(document.getElementById("bmQuantity").value),
+    duration_days: 30,
+    rate_per_mt: b.rate_per_mt || 1200,
+    payment_method: document.getElementById("bmPaymentMethod").value
+  };
+
+  closeModal("bookingModal");
+  appendThinkingBox("Finalizing chamber allocation, verifying FSSAI license & locking escrow transaction...");
+
+  try {
+    const res = await fetch("/api/book", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+    const result = await res.json();
+    removeThinkingBox();
+
+    const booking = result.booking;
+    allBookings.unshift(booking);
+    showVoucher(booking);
+
+    renderAgentResponse({
+      text: `✅ **Booking Confirmed & Escrow Locked!**\n\n` +
+            `• **Booking Reference**: \`${booking.booking_id}\`\n` +
+            `• **Facility**: ${booking.facility_name}\n` +
+            `• **Chamber Allocated**: ${booking.chamber_allocated}\n` +
+            `• **Gate Pass**: Active & Ready for Inward\n\n` +
+            `Your digital certificate is generated and live IoT monitoring is now initialized.`
+    });
+  } catch (err) {
+    removeThinkingBox();
+    const fallbackBooking = {
+      booking_id: "CCX-BK-2026-1083",
+      facility_name: payload.facility_name,
+      facility_id: payload.facility_id,
+      commodity: payload.commodity,
+      quantity_mt: payload.quantity_mt,
+      chamber_allocated: "Chamber 2 (Rack B-10 to B-28)",
+      total_amount: 160480,
+      address: "Bommasandra Industrial Area, Bangalore"
+    };
+    allBookings.unshift(fallbackBooking);
+    showVoucher(fallbackBooking);
+  }
+}
+
+function showVoucher(bk) {
+  document.getElementById("vcBookingId").innerText = bk.booking_id;
+  document.getElementById("vcFacility").innerText = bk.facility_name;
+  document.getElementById("vcAddress").innerText = bk.address || "Bommasandra Industrial Area, Bangalore";
+  document.getElementById("vcChamber").innerText = bk.chamber_allocated || "Chamber 2 (Rack B-04 to B-18)";
+  document.getElementById("vcCommodity").innerText = bk.commodity;
+  document.getElementById("vcQty").innerText = `${bk.quantity_mt} MT (~${Math.round(bk.quantity_mt/0.55)} Pallets)`;
+  document.getElementById("vcTotal").innerText = `₹${(bk.total_amount || 160480).toLocaleString()}`;
+  document.getElementById("vcNodeId").innerText = bk.facility_id;
+
+  document.getElementById("voucherModal").classList.add("show");
+}
+
+// ==========================================
+// DIRECTORY & EXPLORER RENDERING
+// ==========================================
+function renderExplorer(facilities) {
+  const container = document.getElementById("facilitiesGrid");
+  container.innerHTML = "";
+
+  facilities.forEach(f => {
+    const card = document.createElement("div");
+    card.className = "facility-grid-card";
+    card.innerHTML = `
+      <div class="fgc-top">
+        <div>
+          <div class="fgc-title">${f.name}</div>
+          <div class="fgc-location">📍 ${f.city}, ${f.state} (${f.distance_city_km || 15} km from center)</div>
+        </div>
+        <span class="fcc-pill verified" style="font-weight:700;">${f.id}</span>
+      </div>
+
+      <div class="fgc-grid">
+        <div><span>Industry Type</span><strong>${f.category}</strong></div>
+        <div><span>Temp Range</span><strong style="color:var(--text-accent)">${f.temperature_supported}</strong></div>
+        <div><span>Avail Capacity</span><strong>${f.available_mt} MT</strong></div>
+        <div><span>Rate / MT</span><strong style="color:var(--badge-green-text)">₹${(f.rate_per_mt_month || 1200).toLocaleString()}</strong></div>
+      </div>
+
+      <div style="font-size:11px; color:var(--text-muted); line-height:1.4;">
+        ${f.address.substring(0, 65)}...
+      </div>
+
+      <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--border-light); padding-top:10px;">
+        <div style="font-size:10px; color:var(--text-dim);">
+          Docks: <strong>${f.docks}</strong> • DG Backup: <strong>${f.power_backup}</strong>
+        </div>
+        <button class="btn-primary-action" style="padding:6px 12px; font-size:11px;" onclick="switchView('agent'); initiateBooking('${f.id}', '${f.name}', ${f.rate_per_mt_month || 1200})">
+          Book with AI
+        </button>
+      </div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+function filterExplorer() {
+  const search = document.getElementById("expSearch").value.toLowerCase();
+  const city = document.getElementById("expCity").value.toLowerCase();
+  const temp = document.getElementById("expTemp").value.toLowerCase();
+  const minCap = parseInt(document.getElementById("expMinCap").value) || 0;
+
+  const filtered = allFacilities.filter(f => {
+    const matchSearch = !search || f.name.toLowerCase().includes(search) || f.city.toLowerCase().includes(search) || f.id.toLowerCase().includes(search);
+    const matchCity = !city || f.city.toLowerCase().includes(city);
+    const matchTemp = !temp || f.temperature_supported.toLowerCase().includes(temp);
+    const matchCap = !minCap || f.available_mt >= minCap;
+    return matchSearch && matchCity && matchTemp && matchCap;
+  });
+
+  renderExplorer(filtered);
+}
+
+// ==========================================
+// ACTIVE BOOKINGS & IoT TELEMETRY
+// ==========================================
+function renderBookings() {
+  const container = document.getElementById("bookingsList");
+  container.innerHTML = "";
+
+  document.getElementById("statActiveCount").innerText = allBookings.length;
+  const totalMT = allBookings.reduce((sum, b) => sum + (b.quantity_mt || 0), 0);
+  document.getElementById("statMassCount").innerText = `${totalMT} MT`;
+
+  allBookings.forEach(bk => {
+    const item = document.createElement("div");
+    item.className = "booking-telemetry-card";
+
+    let barsHtml = "";
+    const base = bk.live_temp || -18.2;
+    for (let h = 0; h < 24; h++) {
+      const val = (base + (Math.sin(h) * 0.3)).toFixed(1);
+      const height = Math.min(100, Math.max(30, 70 + Math.sin(h) * 15));
+      barsHtml += `<div class="sensor-bar" style="height:${height}%" data-tooltip="${val}°C"></div>`;
+    }
+
+    item.innerHTML = `
+      <div class="btc-head">
+        <div>
+          <h4>${bk.facility_name} — ${bk.booking_id}</h4>
+          <p>Client: <strong>${bk.customer_name}</strong> • Allocated: <strong>${bk.chamber_allocated || 'Chamber 2'}</strong></p>
+        </div>
+        <div style="display:flex; align-items:center; gap:12px;">
+          <span class="live-indicator">
+            <span class="pulse-dot"></span>
+            <span>Telemetry Online</span>
+          </span>
+          <button class="btn-secondary-action" style="font-size:11px;" onclick="showVoucher(allBookings.find(b=>b.booking_id==='${bk.booking_id}'))">
+            📄 Gate Pass
+          </button>
+        </div>
+      </div>
+
+      <div class="telemetry-split">
+        <div class="telemetry-chart-container">
+          <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--text-muted);">
+            <span>24-Hour IoT Temperature Telemetry (${bk.chamber_allocated || 'Chamber 2'})</span>
+            <span style="color:var(--text-accent)">Target: ${bk.target_temp || '-18.0°C'} | Current: ${(bk.live_temp || -18.2)}°C</span>
+          </div>
+          <div class="sensor-bar-chart">
+            ${barsHtml}
+          </div>
+          <div style="display:flex; justify-content:space-between; font-size:10px; color:var(--text-dim);">
+            <span>00:00</span><span>06:00</span><span>12:00</span><span>18:00</span><span>Now</span>
+          </div>
+        </div>
+
+        <div style="background:var(--bg-surface); border:1px solid var(--border-light); border-radius:var(--radius-sm); padding:16px; display:flex; flex-direction:column; justify-content:space-between;">
+          <div>
+            <div style="font-size:11px; color:var(--text-dim); text-transform:uppercase;">Storage Details</div>
+            <div style="font-size:16px; font-weight:700; color:var(--text-main); margin-top:4px;">${bk.commodity}</div>
+            <div style="font-size:13px; color:var(--text-accent); margin-top:2px;">${bk.quantity_mt} MT Mass (${bk.pallets || Math.round(bk.quantity_mt/0.55)} Pallets)</div>
+          </div>
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; font-size:11px; margin-top:10px;">
+            <div><span>Humidity:</span> <strong>${bk.humidity || 86}%</strong></div>
+            <div><span>Doors:</span> <strong style="color:var(--badge-green-text)">Sealed</strong></div>
+            <div><span>Compressor:</span> <strong>Active</strong></div>
+            <div><span>DG Ready:</span> <strong>100%</strong></div>
+          </div>
+          <div style="margin-top:12px; font-size:11px; color:var(--badge-green-text);">
+            ✓ SLA Guarantee Intact (0 Breaches)
+          </div>
+        </div>
+      </div>
+    `;
+    container.appendChild(item);
+  });
+}
+
+// ==========================================
+// REEFER FLEET RENDERING
+// ==========================================
+function renderFleet() {
+  const container = document.getElementById("fleetGrid");
+  container.innerHTML = "";
+
+  const fleetTypes = [
+    { type: "Heavy Reefer Truck (MCV / HCV)", cap: "10-15 MT (24 Feet)", temp: "-25°C to +15°C", fuel: "Diesel", mfg: "Tata / Ashok Leyland", rate: "₹35 - ₹45 / km", desc: "Best for bulk frozen French Fries, Dairy, and Seafood distribution across state highways." },
+    { type: "Medium Reefer Truck (LCV)", cap: "5-8 MT (17 Feet)", temp: "-20°C to +10°C", fuel: "Diesel", mfg: "Eicher Pro", rate: "₹30 - ₹35 / km", desc: "Ideal for city supply chains, quick retail restocking, and regional cold hubs." },
+    { type: "Multi-Temperature Truck", cap: "12 MT (Dual Chamber)", temp: "Zone A: -18°C | Zone B: +4°C", fuel: "Diesel", mfg: "BharatBenz", rate: "₹42 / km", desc: "Simultaneous transport of frozen and chilled commodities in dedicated temperature zones." },
+    { type: "Small Insulated Van (EV / CNG)", cap: "2.5 MT (10 Feet)", temp: "-10°C to +15°C", fuel: "CNG / Electric", mfg: "Mahindra Bolero Maxi", rate: "₹25 / km", desc: "Last-mile intracity delivery for cloud kitchens, supermarkets, and catering hubs." }
+  ];
+
+  fleetTypes.forEach(ft => {
+    const card = document.createElement("div");
+    card.className = "facility-grid-card";
+    card.innerHTML = `
+      <div class="fgc-top">
+        <div>
+          <div class="fgc-title">${ft.type}</div>
+          <div class="fgc-location">Manufacturer: ${ft.mfg}</div>
+        </div>
+        <span class="fcc-pill verified">IoT GPS Active</span>
+      </div>
+
+      <div class="fgc-grid">
+        <div><span>Capacity</span><strong>${ft.cap}</strong></div>
+        <div><span>Temp Range</span><strong style="color:var(--text-accent)">${ft.temp}</strong></div>
+        <div><span>Fuel Type</span><strong>${ft.fuel}</strong></div>
+        <div><span>Base Tariff</span><strong style="color:var(--badge-green-text)">${ft.rate}</strong></div>
+      </div>
+
+      <p style="font-size:12px; color:var(--text-muted); line-height:1.5;">${ft.desc}</p>
+
+      <button class="btn-primary-action" style="margin-top:auto;" onclick="switchView('agent'); useQuickPrompt('I also need reefer truck transportation for 100 MT in Bengaluru');">
+        🚚 Dispatch with AI Agent
+      </button>
+    `;
+    container.appendChild(card);
+  });
+}
+
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+</script>
+</body>
+</html>

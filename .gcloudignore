@@ -1,0 +1,24 @@
+# Google Cloud Run / Cloud Build Ignore
+node_modules/
+npm-debug.log*
+
+# Environment variable files and secrets
+.env
+.env.*
+*.local
+*.pem
+*.key
+*.cert
+id_rsa*
+gcloud-credentials.json
+service-account*.json
+credentials.json
+
+.git/
+.gitignore
+.dockerignore
+.gcloudignore
+.vscode/
+.idea/
+scratch/
+.system_generated/

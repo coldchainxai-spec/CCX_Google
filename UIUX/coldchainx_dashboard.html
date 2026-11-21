@@ -1,0 +1,255 @@
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Sora:wght@600;700&display=swap');
+  .ccx-dash * { box-sizing: border-box; margin: 0; padding: 0; }
+  .ccx-dash { font-family: 'DM Sans', sans-serif; background: #F0F4F8; display: flex; min-height: 640px; border-radius: 14px; overflow: hidden; }
+  .sidebar { width: 220px; background: #00329B; flex-shrink: 0; padding: 20px 0; display: flex; flex-direction: column; }
+  .sb-brand { padding: 0 20px 20px; border-bottom: 0.5px solid rgba(255,255,255,0.1); }
+  .sb-logo { display: flex; align-items: center; gap: 8px; }
+  .sb-logo-icon { width: 30px; height: 30px; background: rgba(255,255,255,0.15); border-radius: 6px; display: flex; align-items: center; justify-content: center; }
+  .sb-brand-name { font-family: 'Sora', sans-serif; font-size: 15px; font-weight: 700; color: #fff; }
+  .sb-brand-name span { color: #38BDF8; }
+  .sb-nav { padding: 12px 0; flex: 1; }
+  .nav-group-label { font-size: 9px; color: rgba(255,255,255,0.35); font-weight: 600; letter-spacing: 0.8px; padding: 8px 20px 4px; text-transform: uppercase; }
+  .nav-item { display: flex; align-items: center; gap: 9px; padding: 9px 20px; font-size: 13px; color: rgba(255,255,255,0.65); cursor: pointer; transition: all 0.15s; border-left: 2px solid transparent; }
+  .nav-item:hover { background: rgba(255,255,255,0.06); color: #fff; }
+  .nav-item.active { background: rgba(255,255,255,0.12); color: #fff; border-left-color: #38BDF8; }
+  .nav-item .nav-icon { font-size: 14px; width: 16px; text-align: center; }
+  .nav-badge { margin-left: auto; background: #EF4444; color: #fff; font-size: 10px; font-weight: 600; padding: 1px 6px; border-radius: 999px; }
+  .sb-user { padding: 16px 20px; border-top: 0.5px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 10px; }
+  .user-avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #0F766E, #38BDF8); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: #fff; flex-shrink: 0; }
+  .user-name { font-size: 12px; font-weight: 500; color: #fff; }
+  .user-role { font-size: 10px; color: rgba(255,255,255,0.5); }
+  .main-content { flex: 1; overflow: auto; }
+  .top-bar { background: #fff; border-bottom: 0.5px solid #E2E8F0; padding: 12px 24px; display: flex; align-items: center; justify-content: space-between; }
+  .top-bar-title { font-family: 'Sora', sans-serif; font-size: 16px; font-weight: 700; color: #1A1A1A; }
+  .top-bar-right { display: flex; align-items: center; gap: 12px; }
+  .tb-notif { width: 34px; height: 34px; border-radius: 8px; border: 0.5px solid #E2E8F0; display: flex; align-items: center; justify-content: center; cursor: pointer; position: relative; }
+  .tb-notif-dot { width: 8px; height: 8px; background: #EF4444; border-radius: 50%; position: absolute; top: 6px; right: 7px; }
+  .toggle-availability { display: flex; align-items: center; gap: 8px; padding: 6px 14px; border-radius: 20px; border: 1.5px solid; cursor: pointer; font-size: 12px; font-weight: 600; transition: all 0.2s; }
+  .toggle-availability.on { background: #F0FDF4; border-color: #22C55E; color: #15803D; }
+  .toggle-availability.off { background: #F8FAFC; border-color: #94A3B8; color: #64748B; }
+  .toggle-dot { width: 8px; height: 8px; border-radius: 50%; }
+  .toggle-dot.on { background: #22C55E; }
+  .toggle-dot.off { background: #94A3B8; }
+  .content-body { padding: 20px 24px; }
+  .section-label { font-size: 11px; color: #94A3B8; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 12px; }
+  .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+  .kpi-card { background: #fff; border-radius: 12px; border: 0.5px solid #E2E8F0; padding: 16px; }
+  .kpi-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .kpi-icon { width: 34px; height: 34px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+  .kpi-ki-teal { background: #CCFBF1; }
+  .kpi-ki-blue { background: #DBEAFE; }
+  .kpi-ki-green { background: #DCFCE7; }
+  .kpi-ki-amber { background: #FEF3C7; }
+  .kpi-trend { font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: 500; }
+  .kpi-trend.up { background: #DCFCE7; color: #15803D; }
+  .kpi-trend.down { background: #FEF2F2; color: #DC2626; }
+  .kpi-num { font-family: 'Sora', sans-serif; font-size: 22px; font-weight: 700; color: #1A1A1A; }
+  .kpi-label { font-size: 12px; color: #64748B; margin-top: 2px; }
+  .mid-grid { display: grid; grid-template-columns: 1fr 340px; gap: 16px; margin-bottom: 20px; }
+  .capacity-card { background: #fff; border-radius: 12px; border: 0.5px solid #E2E8F0; padding: 20px; }
+  .cap-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+  .cap-title { font-family: 'Sora', sans-serif; font-size: 14px; font-weight: 600; color: #1A1A1A; }
+  .cap-edit { font-size: 12px; color: #0F766E; cursor: pointer; font-weight: 500; }
+  .cap-bar-container { margin-bottom: 16px; }
+  .cap-info { display: flex; justify-content: space-between; font-size: 12px; color: #64748B; margin-bottom: 6px; }
+  .cap-info strong { color: #1A1A1A; font-weight: 600; }
+  .bar-track { height: 10px; background: #F1F5F9; border-radius: 999px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 999px; transition: width 0.6s; }
+  .bar-fill.green { background: linear-gradient(90deg, #22C55E, #16A34A); }
+  .bar-fill.amber { background: linear-gradient(90deg, #F59E0B, #D97706); }
+  .bar-fill.red { background: linear-gradient(90deg, #EF4444, #DC2626); }
+  .chamber-list { display: flex; flex-direction: column; gap: 8px; }
+  .chamber-row { display: flex; align-items: center; gap: 10px; font-size: 12px; }
+  .chamber-name { width: 90px; color: #64748B; flex-shrink: 0; }
+  .chamber-bar { flex: 1; height: 6px; background: #F1F5F9; border-radius: 999px; overflow: hidden; }
+  .chamber-bar-fill { height: 100%; border-radius: 999px; }
+  .chamber-val { width: 42px; text-align: right; color: #1A1A1A; font-weight: 500; font-size: 11px; }
+  .bookings-card { background: #fff; border-radius: 12px; border: 0.5px solid #E2E8F0; padding: 20px; }
+  .booking-item { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 0.5px solid #F1F5F9; }
+  .booking-item:last-child { border-bottom: none; }
+  .booking-avatar { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; flex-shrink: 0; }
+  .booking-info { flex: 1; }
+  .booking-name { font-size: 12px; font-weight: 500; color: #1A1A1A; }
+  .booking-sub { font-size: 11px; color: #94A3B8; }
+  .booking-status { font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 4px; }
+  .bs-pending { background: #FEF3C7; color: #92400E; }
+  .bs-active { background: #DCFCE7; color: #15803D; }
+  .bs-full { background: #FEF2F2; color: #991B1B; }
+  .temp-row { display: flex; gap: 8px; margin-bottom: 20px; }
+  .temp-card { flex: 1; background: #fff; border-radius: 10px; border: 0.5px solid #E2E8F0; padding: 12px; text-align: center; }
+  .temp-val { font-family: 'Sora', sans-serif; font-size: 18px; font-weight: 700; }
+  .temp-label { font-size: 10px; color: #94A3B8; margin-top: 2px; }
+  .temp-badge { display: inline-block; font-size: 9px; font-weight: 600; padding: 2px 6px; border-radius: 3px; margin-top: 4px; }
+  .activity-list { background: #fff; border-radius: 12px; border: 0.5px solid #E2E8F0; padding: 16px 20px; }
+  .activity-item { display: flex; align-items: flex-start; gap: 10px; padding: 8px 0; border-bottom: 0.5px solid #F8FAFC; }
+  .activity-item:last-child { border-bottom: none; }
+  .activity-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+  .activity-text { font-size: 12px; color: #374151; }
+  .activity-time { font-size: 10px; color: #94A3B8; margin-top: 2px; }
+</style>
+<div class="ccx-dash">
+  <div class="sidebar">
+    <div class="sb-brand">
+      <div class="sb-logo">
+        <div class="sb-logo-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg></div>
+        <div class="sb-brand-name">Cold<span>Chain</span>X</div>
+      </div>
+    </div>
+    <div class="sb-nav">
+      <div class="nav-group-label">Main</div>
+      <div class="nav-item active"><span class="nav-icon">📊</span> Dashboard</div>
+      <div class="nav-item"><span class="nav-icon">🏭</span> My Storage</div>
+      <div class="nav-item"><span class="nav-icon">📦</span> Bookings <span class="nav-badge">3</span></div>
+      <div class="nav-group-label">Manage</div>
+      <div class="nav-item"><span class="nav-icon">🌡</span> Capacity</div>
+      <div class="nav-item"><span class="nav-icon">💰</span> Pricing</div>
+      <div class="nav-item"><span class="nav-icon">🚚</span> Logistics</div>
+      <div class="nav-group-label">Reports</div>
+      <div class="nav-item"><span class="nav-icon">📈</span> Analytics</div>
+      <div class="nav-item"><span class="nav-icon">📋</span> Audit Logs</div>
+      <div class="nav-item"><span class="nav-icon">🔔</span> Alerts <span class="nav-badge">2</span></div>
+    </div>
+    <div class="sb-user">
+      <div class="user-avatar">RS</div>
+      <div>
+        <div class="user-name">Rajesh Sharma</div>
+        <div class="user-role">Storage Owner</div>
+      </div>
+    </div>
+  </div>
+  <div class="main-content">
+    <div class="top-bar">
+      <div>
+        <div class="top-bar-title">Storage Dashboard</div>
+        <div style="font-size:11px;color:#94A3B8;margin-top:1px;">Shree Krishna Cold Storage, Pune</div>
+      </div>
+      <div class="top-bar-right">
+        <div class="toggle-availability on" onclick="this.classList.toggle('on');this.classList.toggle('off');this.querySelector('.toggle-dot').classList.toggle('on');this.querySelector('.toggle-dot').classList.toggle('off');this.querySelector('.ta-text').textContent=this.classList.contains('on')?'AVAILABLE':'NOT AVAILABLE';">
+          <div class="toggle-dot on"></div>
+          <span class="ta-text">AVAILABLE</span>
+        </div>
+        <div class="tb-notif">🔔<div class="tb-notif-dot"></div></div>
+        <div style="font-size:12px;color:#64748B;">⚙</div>
+      </div>
+    </div>
+    <div class="content-body">
+      <div class="section-label">Overview</div>
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-top"><div class="kpi-icon kpi-ki-teal">🏭</div><div class="kpi-trend up">↑ 4%</div></div>
+          <div class="kpi-num">500 MT</div>
+          <div class="kpi-label">Total Capacity</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-top"><div class="kpi-icon kpi-ki-green">✅</div><div class="kpi-trend up">+20 MT</div></div>
+          <div class="kpi-num">150 MT</div>
+          <div class="kpi-label">Available Now</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-top"><div class="kpi-icon kpi-ki-amber">📈</div><div class="kpi-trend down">↑ 2%</div></div>
+          <div class="kpi-num">70%</div>
+          <div class="kpi-label">Utilization</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-top"><div class="kpi-icon kpi-ki-blue">📦</div><div class="kpi-trend up">+1</div></div>
+          <div class="kpi-num">3</div>
+          <div class="kpi-label">Active Bookings</div>
+        </div>
+      </div>
+      <div class="temp-row">
+        <div class="temp-card"><div class="temp-val" style="color:#38BDF8;">-22°C</div><div class="temp-label">Chamber A – Frozen</div><div class="temp-badge" style="background:#EFF6FF;color:#1D4ED8;">❄ Optimal</div></div>
+        <div class="temp-card"><div class="temp-val" style="color:#22C55E;">4°C</div><div class="temp-label">Chamber B – Chilled</div><div class="temp-badge" style="background:#F0FDF4;color:#15803D;">🌿 Normal</div></div>
+        <div class="temp-card"><div class="temp-val" style="color:#F59E0B;">18°C</div><div class="temp-label">Chamber C – Ambient</div><div class="temp-badge" style="background:#FFFBEB;color:#92400E;">☀ Normal</div></div>
+        <div class="temp-card"><div class="temp-val" style="color:#EF4444;">-5°C</div><div class="temp-label">Chamber D – Frozen</div><div class="temp-badge" style="background:#FEF2F2;color:#991B1B;">⚠ Drift Alert</div></div>
+      </div>
+      <div class="mid-grid">
+        <div class="capacity-card">
+          <div class="cap-header"><div class="cap-title">Capacity Breakdown</div><div class="cap-edit">✏ Update Capacity</div></div>
+          <div class="cap-bar-container">
+            <div class="cap-info"><span>Total <strong>500 MT</strong></span><span>Used <strong>350 MT (70%)</strong></span><span>Free <strong>150 MT</strong></span></div>
+            <div class="bar-track"><div class="bar-fill amber" style="width:70%;"></div></div>
+          </div>
+          <div class="section-label" style="margin-top:14px;">Chamber Breakdown</div>
+          <div class="chamber-list">
+            <div class="chamber-row">
+              <div class="chamber-name">Chamber A</div>
+              <div class="chamber-bar"><div class="chamber-bar-fill" style="width:92%;background:#38BDF8;"></div></div>
+              <div class="chamber-val" style="color:#0369A1;">92%</div>
+            </div>
+            <div class="chamber-row">
+              <div class="chamber-name">Chamber B</div>
+              <div class="chamber-bar"><div class="chamber-bar-fill" style="width:55%;background:#22C55E;"></div></div>
+              <div class="chamber-val" style="color:#15803D;">55%</div>
+            </div>
+            <div class="chamber-row">
+              <div class="chamber-name">Chamber C</div>
+              <div class="chamber-bar"><div class="chamber-bar-fill" style="width:38%;background:#FACC15;"></div></div>
+              <div class="chamber-val" style="color:#A16207;">38%</div>
+            </div>
+            <div class="chamber-row">
+              <div class="chamber-name">Chamber D</div>
+              <div class="chamber-bar"><div class="chamber-bar-fill" style="width:85%;background:#F97316;"></div></div>
+              <div class="chamber-val" style="color:#C2410C;">85%</div>
+            </div>
+          </div>
+          <div style="margin-top:16px;display:flex;gap:10px;">
+            <button style="flex:1;height:36px;border:none;border-radius:7px;background:#00329B;color:#fff;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;">Update Capacity</button>
+            <button style="flex:1;height:36px;border:0.5px solid #E2E8F0;border-radius:7px;background:#fff;color:#1A1A1A;font-family:'DM Sans',sans-serif;font-size:12px;cursor:pointer;">View Bookings</button>
+          </div>
+        </div>
+        <div class="bookings-card">
+          <div class="cap-header"><div class="cap-title">Recent Bookings</div><div class="cap-edit">View all →</div></div>
+          <div class="booking-item">
+            <div class="booking-avatar" style="background:#DBEAFE;color:#1E40AF;">AF</div>
+            <div class="booking-info">
+              <div class="booking-name">AgroFresh India Ltd</div>
+              <div class="booking-sub">80 MT · 30 days · Chilled</div>
+            </div>
+            <div class="booking-status bs-active">Active</div>
+          </div>
+          <div class="booking-item">
+            <div class="booking-avatar" style="background:#FEF3C7;color:#92400E;">SK</div>
+            <div class="booking-info">
+              <div class="booking-name">Sukh Farms Co-op</div>
+              <div class="booking-sub">120 MT · 15 days · Frozen</div>
+            </div>
+            <div class="booking-status bs-pending">Pending</div>
+          </div>
+          <div class="booking-item">
+            <div class="booking-avatar" style="background:#DCFCE7;color:#15803D;">VP</div>
+            <div class="booking-info">
+              <div class="booking-name">Veg Plus Distributors</div>
+              <div class="booking-sub">60 MT · 7 days · Ambient</div>
+            </div>
+            <div class="booking-status bs-active">Active</div>
+          </div>
+          <div class="booking-item">
+            <div class="booking-avatar" style="background:#F3E8FF;color:#6B21A8;">RC</div>
+            <div class="booking-info">
+              <div class="booking-name">RetailCo Express</div>
+              <div class="booking-sub">90 MT · 45 days · Chilled</div>
+            </div>
+            <div class="booking-status bs-pending">Pending</div>
+          </div>
+          <div style="margin-top:12px;">
+            <div class="section-label">Recent Activity</div>
+            <div class="activity-item">
+              <div class="activity-dot" style="background:#22C55E;"></div>
+              <div><div class="activity-text">Booking #BK-1042 confirmed by AgroFresh</div><div class="activity-time">2 hours ago</div></div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-dot" style="background:#F59E0B;"></div>
+              <div><div class="activity-text">Chamber D temperature drift detected</div><div class="activity-time">4 hours ago</div></div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-dot" style="background:#0F766E;"></div>
+              <div><div class="activity-text">Capacity updated: 150 MT available</div><div class="activity-time">Yesterday</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

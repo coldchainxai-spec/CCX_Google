@@ -1,0 +1,27 @@
+# Dependency directories
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment variable files and secrets
+.env
+.env.*
+*.local
+*.pem
+*.key
+*.cert
+id_rsa*
+gcloud-credentials.json
+service-account*.json
+credentials.json
+
+# Local git and metadata
+.git/
+.gitignore
+.dockerignore
+.gcloudignore
+.vscode/
+.idea/
+scratch/
+.system_generated/

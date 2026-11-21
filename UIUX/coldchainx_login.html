@@ -1,0 +1,116 @@
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Sora:wght@600;700&display=swap');
+  .ccx-login * { box-sizing: border-box; margin: 0; padding: 0; }
+  .ccx-login { font-family: 'DM Sans', sans-serif; background: #F0F4F8; display: flex; min-height: 560px; }
+  .login-left { width: 44%; background: linear-gradient(160deg, #0F766E 0%, #00329B 60%, #1e1b4b 100%); padding: 40px 36px; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden; border-radius: 14px 0 0 14px; }
+  .login-left::before { content: ''; position: absolute; width: 280px; height: 280px; border-radius: 50%; background: rgba(255,255,255,0.04); top: -80px; right: -80px; }
+  .login-left::after { content: ''; position: absolute; width: 180px; height: 180px; border-radius: 50%; background: rgba(255,255,255,0.04); bottom: 40px; left: -60px; }
+  .ll-logo { display: flex; align-items: center; gap: 10px; margin-bottom: 40px; }
+  .ll-logo-icon { width: 38px; height: 38px; background: rgba(255,255,255,0.15); border-radius: 9px; display: flex; align-items: center; justify-content: center; }
+  .ll-brand { font-family: 'Sora', sans-serif; font-size: 19px; font-weight: 700; color: #fff; }
+  .ll-brand span { color: #38BDF8; }
+  .ll-hero { position: relative; z-index: 1; }
+  .ll-headline { font-family: 'Sora', sans-serif; font-size: 26px; font-weight: 700; color: #fff; line-height: 1.25; margin-bottom: 12px; }
+  .ll-sub { font-size: 13px; color: rgba(255,255,255,0.65); line-height: 1.6; }
+  .ll-stats { display: flex; gap: 16px; margin-top: 28px; }
+  .ll-stat { background: rgba(255,255,255,0.1); border-radius: 10px; padding: 12px 14px; }
+  .ll-stat-num { font-family: 'Sora', sans-serif; font-size: 20px; font-weight: 700; color: #fff; }
+  .ll-stat-label { font-size: 10px; color: rgba(255,255,255,0.6); margin-top: 2px; }
+  .ll-badges { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 20px; }
+  .ll-badge { display: flex; align-items: center; gap: 4px; background: rgba(255,255,255,0.1); border-radius: 6px; padding: 5px 10px; font-size: 11px; color: rgba(255,255,255,0.8); }
+  .login-right { flex: 1; background: #fff; border-radius: 0 14px 14px 0; padding: 40px 36px; display: flex; flex-direction: column; justify-content: center; }
+  .lr-title { font-family: 'Sora', sans-serif; font-size: 22px; font-weight: 700; color: #1A1A1A; margin-bottom: 4px; }
+  .lr-sub { font-size: 13px; color: #64748B; margin-bottom: 28px; }
+  .role-tabs { display: flex; gap: 0; border: 1px solid #E2E8F0; border-radius: 8px; overflow: hidden; margin-bottom: 24px; }
+  .role-tab { flex: 1; padding: 9px 8px; font-size: 12px; font-weight: 500; text-align: center; cursor: pointer; transition: all 0.15s; color: #64748B; border: none; background: transparent; font-family: 'DM Sans', sans-serif; }
+  .role-tab.active { background: #00329B; color: #fff; }
+  .form-group { margin-bottom: 14px; }
+  .form-label { font-size: 12px; color: #64748B; font-weight: 500; margin-bottom: 5px; display: block; }
+  .form-input { width: 100%; height: 42px; border: 1px solid #CBD5E1; border-radius: 8px; padding: 0 12px; font-size: 13px; color: #1A1A1A; font-family: 'DM Sans', sans-serif; outline: none; transition: border 0.15s; }
+  .form-input:focus { border-color: #00329B; box-shadow: 0 0 0 2px rgba(0,50,155,0.08); }
+  .phone-input { display: flex; gap: 8px; }
+  .country-code { width: 72px; height: 42px; border: 1px solid #CBD5E1; border-radius: 8px; padding: 0 10px; font-size: 13px; color: #1A1A1A; font-family: 'DM Sans', sans-serif; outline: none; flex-shrink: 0; }
+  .otp-row { display: flex; gap: 8px; justify-content: center; margin: 16px 0; }
+  .otp-box { width: 46px; height: 50px; border: 1.5px solid #CBD5E1; border-radius: 8px; text-align: center; font-size: 20px; font-weight: 600; font-family: 'Sora', sans-serif; color: #00329B; outline: none; }
+  .otp-box:focus { border-color: #00329B; box-shadow: 0 0 0 2px rgba(0,50,155,0.1); }
+  .otp-box.filled { border-color: #0F766E; background: #F0FDF9; }
+  .send-otp-btn { width: 100%; height: 44px; border: none; border-radius: 8px; background: linear-gradient(135deg, #00329B, #0F766E); font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; color: #fff; cursor: pointer; margin-top: 4px; }
+  .divider-or { display: flex; align-items: center; gap: 10px; margin: 16px 0; }
+  .divider-or::before, .divider-or::after { content: ''; flex: 1; height: 0.5px; background: #E2E8F0; }
+  .divider-or span { font-size: 12px; color: #94A3B8; }
+  .footer-link { font-size: 12px; color: #64748B; text-align: center; margin-top: 16px; }
+  .footer-link a { color: #0F766E; font-weight: 500; text-decoration: none; }
+  .otp-section { display: none; }
+  .otp-hint { font-size: 12px; color: #64748B; text-align: center; margin-bottom: 8px; }
+  .resend { font-size: 12px; color: #0F766E; text-align: center; cursor: pointer; margin-top: 6px; }
+  .pw-toggle { position: relative; }
+  .pw-toggle input { padding-right: 36px; }
+  .pw-toggle .eye-icon { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; font-size: 14px; color: #94A3B8; }
+</style>
+<div class="ccx-login" style="border-radius:14px;overflow:hidden;box-shadow:0 4px 32px rgba(0,0,0,0.08);">
+  <div class="login-left">
+    <div>
+      <div class="ll-logo">
+        <div class="ll-logo-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg></div>
+        <div class="ll-brand">Cold<span>Chain</span>X</div>
+      </div>
+      <div class="ll-hero">
+        <div class="ll-headline">India's Smartest Cold Chain Platform</div>
+        <div class="ll-sub">Connect your cold storage facility to thousands of producers and shippers across India.</div>
+        <div class="ll-stats">
+          <div class="ll-stat"><div class="ll-stat-num">2,400+</div><div class="ll-stat-label">Storage Units</div></div>
+          <div class="ll-stat"><div class="ll-stat-num">18 MT</div><div class="ll-stat-label">Capacity Managed</div></div>
+        </div>
+        <div class="ll-badges">
+          <div class="ll-badge">❄ Frozen</div>
+          <div class="ll-badge">🌿 Chilled</div>
+          <div class="ll-badge">☀ Ambient</div>
+          <div class="ll-badge">🚚 Reefer Fleet</div>
+          <div class="ll-badge">📊 Live Dashboard</div>
+        </div>
+      </div>
+    </div>
+    <div style="font-size:11px;color:rgba(255,255,255,0.35);">© 2025 ColdChainX Technologies Pvt Ltd</div>
+  </div>
+  <div class="login-right">
+    <div class="lr-title">Welcome back</div>
+    <div class="lr-sub">Sign in to manage your cold storage facility</div>
+    <div class="role-tabs">
+      <button class="role-tab active">🏭 Storage Owner</button>
+      <button class="role-tab">👤 Admin</button>
+      <button class="role-tab">🚛 Producer</button>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Mobile Number</label>
+      <div class="phone-input">
+        <input class="country-code" value="+91" readonly>
+        <input class="form-input" type="tel" placeholder="98765 43210" value="98765 43210">
+      </div>
+    </div>
+    <button class="send-otp-btn" onclick="document.querySelector('.otp-hint').parentElement.style.display='block';this.textContent='OTP Sent to +91 98765 43210 ✓';this.style.background='#0F766E';">Send OTP →</button>
+    <div class="otp-section" style="display:block;margin-top:16px;">
+      <div class="otp-hint">Enter 6-digit OTP sent to your mobile</div>
+      <div class="otp-row">
+        <input class="otp-box filled" maxlength="1" value="4">
+        <input class="otp-box filled" maxlength="1" value="2">
+        <input class="otp-box filled" maxlength="1" value="7">
+        <input class="otp-box" maxlength="1" placeholder="—">
+        <input class="otp-box" maxlength="1" placeholder="—">
+        <input class="otp-box" maxlength="1" placeholder="—">
+      </div>
+      <div class="resend">Resend OTP in 00:42</div>
+    </div>
+    <div class="divider-or"><span>or continue with password</span></div>
+    <div class="form-group">
+      <label class="form-label">Password</label>
+      <div class="pw-toggle">
+        <input class="form-input" type="password" placeholder="Enter your password" value="••••••••••">
+        <span class="eye-icon">👁</span>
+      </div>
+    </div>
+    <button style="width:100%;height:44px;border:none;border-radius:8px;background:linear-gradient(135deg,#00329B,#0F766E);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;color:#fff;cursor:pointer;">Sign In to Dashboard →</button>
+    <div class="footer-link">New storage owner? <a href="#">Register your facility</a></div>
+    <div class="footer-link" style="margin-top:6px;"><a href="#">Forgot password?</a></div>
+  </div>
+</div>

@@ -1,0 +1,30 @@
+# Google Cloud Run / Cloud Build Ignore
+# Excludes local files from being uploaded to Google Cloud Build
+
+# Dependency directories (installed fresh inside Docker)
+node_modules/
+npm-debug.log*
+
+# Environment variable files and secrets (NEVER upload credentials or API keys)
+.env
+.env.*
+*.local
+*.pem
+*.key
+*.cert
+id_rsa*
+gcloud-credentials.json
+service-account*.json
+credentials.json
+
+# Local git and metadata
+.git/
+.gitignore
+.dockerignore
+.gcloudignore
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+scratch/
+.system_generated/

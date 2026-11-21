@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ColdChainX — Storage Owner Registration</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Sora:wght@600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'DM Sans', sans-serif; background: #F0F4F8; min-height: 100vh; }
+
+    .reg-header { background: linear-gradient(135deg, #0F766E 0%, #00329B 100%); padding: 20px 32px; display: flex; align-items: center; gap: 14px; }
+    .reg-logo { width: 36px; height: 36px; background: rgba(255,255,255,0.2); border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+    .reg-brand { font-family: 'Sora', sans-serif; font-size: 18px; font-weight: 700; color: #fff; letter-spacing: -0.3px; }
+    .reg-brand span { color: #38BDF8; }
+    .reg-body { max-width: 860px; margin: 0 auto; padding: 28px 20px 48px; }
+
+    .reg-progress { background: #fff; border-radius: 12px; padding: 20px 28px; margin-bottom: 24px; border: 0.5px solid #E2E8F0; }
+    .reg-progress-label { font-size: 12px; color: #64748B; font-weight: 500; margin-bottom: 10px; }
+    .progress-steps { display: flex; align-items: center; }
+    .step-item { display: flex; align-items: center; flex: 1; }
+    .step-dot { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; flex-shrink: 0; }
+    .step-dot.done { background: #0F766E; color: #fff; }
+    .step-dot.active { background: #00329B; color: #fff; box-shadow: 0 0 0 3px rgba(0,50,155,0.15); }
+    .step-dot.pending { background: #E2E8F0; color: #94A3B8; }
+    .step-line { flex: 1; height: 2px; background: #E2E8F0; }
+    .step-line.done { background: #0F766E; }
+    .steps-labels { display: flex; justify-content: space-between; margin-top: 6px; padding: 0 2px; }
+    .step-label { font-size: 10px; color: #94A3B8; }
+    .step-label.active { color: #00329B; font-weight: 500; }
+
+    .reg-section { background: #fff; border-radius: 14px; border: 0.5px solid #E2E8F0; margin-bottom: 20px; overflow: hidden; }
+    .section-header { padding: 16px 24px; border-bottom: 0.5px solid #F1F5F9; display: flex; align-items: center; gap: 10px; }
+    .section-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 15px; }
+    .si-teal { background: #CCFBF1; }
+    .si-blue { background: #DBEAFE; }
+    .si-green { background: #DCFCE7; }
+    .section-title { font-family: 'Sora', sans-serif; font-size: 14px; font-weight: 600; color: #1A1A1A; }
+    .section-body { padding: 20px 24px; }
+
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .form-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+    .form-group { display: flex; flex-direction: column; gap: 5px; }
+    .form-group.full { grid-column: 1 / -1; }
+    .form-label { font-size: 12px; color: #64748B; font-weight: 500; }
+    .form-label .req { color: #EF4444; }
+    .form-input { height: 40px; border: 1px solid #CBD5E1; border-radius: 8px; padding: 0 12px; font-size: 13px; color: #1A1A1A; font-family: 'DM Sans', sans-serif; outline: none; transition: border 0.15s; background: #fff; }
+    .form-input:focus { border-color: #00329B; box-shadow: 0 0 0 2px rgba(0,50,155,0.08); }
+    .form-select { height: 40px; border: 1px solid #CBD5E1; border-radius: 8px; padding: 0 12px; font-size: 13px; color: #1A1A1A; font-family: 'DM Sans', sans-serif; outline: none; background: #fff; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; cursor: pointer; }
+
+    .temp-pills { display: flex; gap: 8px; flex-wrap: wrap; }
+    .temp-pill { display: flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 999px; border: 1.5px solid #E2E8F0; font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.15s; }
+    .temp-pill.frozen { background: #EFF6FF; border-color: #38BDF8; color: #0369A1; }
+    .temp-pill.chilled { background: #F0FDF4; border-color: #22C55E; color: #15803D; }
+    .temp-pill.ambient { background: #FEFCE8; border-color: #FACC15; color: #A16207; }
+
+    .doc-upload-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .doc-upload { border: 1.5px dashed #CBD5E1; border-radius: 10px; padding: 16px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: all 0.15s; }
+    .doc-upload:hover { border-color: #0F766E; background: #F0FDF9; }
+    .doc-icon { width: 36px; height: 36px; border-radius: 8px; background: #F1F5F9; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 18px; }
+    .doc-name { font-size: 12px; font-weight: 500; color: #1A1A1A; }
+    .doc-sub { font-size: 11px; color: #94A3B8; }
+
+    .toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-radius: 8px; background: #F8FAFC; }
+    .toggle-label { font-size: 13px; color: #1A1A1A; font-weight: 500; }
+    .toggle-sub { font-size: 11px; color: #94A3B8; }
+    .toggle-switch { width: 40px; height: 22px; background: #22C55E; border-radius: 999px; position: relative; cursor: pointer; transition: background 0.2s; }
+    .toggle-switch::after { content: ''; position: absolute; top: 3px; width: 16px; height: 16px; background: #fff; border-radius: 50%; transition: left 0.2s; left: calc(100% - 19px); }
+
+    .btn-row { display: flex; gap: 12px; margin-top: 24px; }
+    .btn-back { flex: 1; height: 44px; border: 1px solid #CBD5E1; border-radius: 8px; background: #fff; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; color: #64748B; cursor: pointer; }
+    .btn-next { flex: 2; height: 44px; border: none; border-radius: 8px; background: linear-gradient(135deg, #00329B, #0F766E); font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; color: #fff; cursor: pointer; }
+
+    .ya-badge { display: inline-flex; align-items: center; gap: 5px; background: #FEF3C7; color: #92400E; font-size: 11px; font-weight: 500; padding: 3px 8px; border-radius: 4px; }
+    .divider { height: 0.5px; background: #F1F5F9; margin: 16px 0; }
+
+    @media (max-width: 600px) {
+      .form-grid, .form-grid-3, .doc-upload-grid { grid-template-columns: 1fr; }
+      .form-group.full { grid-column: 1; }
+    }
+  </style>
+</head>
+<body>
+  <div class="reg-header">
+    <div class="reg-logo">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2">
+        <rect x="2" y="7" width="20" height="14" rx="2"/>
+        <path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/>
+        <line x1="12" y1="12" x2="12" y2="16"/>
+        <line x1="10" y1="14" x2="14" y2="14"/>
+      </svg>
+    </div>
+    <div>
+      <div class="reg-brand">Cold<span>Chain</span>X</div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.65);margin-top:1px;">Storage Owner Registration</div>
+    </div>
+    <div style="margin-left:auto;"><span class="ya-badge">📋 Step 2 of 5</span></div>
+  </div>
+
+  <div class="reg-body">
+    <!-- Progress Tracker -->
+    <div class="reg-progress">
+      <div class="reg-progress-label">Onboarding Progress</div>
+      <div class="progress-steps">
+        <div class="step-item">
+          <div style="display:flex;flex-direction:column;align-items:center;">
+            <div class="step-dot done">✓</div>
+          </div>
+        </div>
+        <div class="step-line done"></div>
+        <div class="step-item">
+          <div style="display:flex;flex-direction:column;align-items:center;">
+            <div class="step-dot active">2</div>
+          </div>
+        </div>
+        <div class="step-line"></div>
+        <div class="step-item">
+          <div style="display:flex;flex-direction:column;align-items:center;">
+            <div class="step-dot pending">3</div>
+          </div>
+        </div>
+        <div class="step-line"></div>
+        <div class="step-item">
+          <div style="display:flex;flex-direction:column;align-items:center;">
+            <div class="step-dot pending">4</div>
+          </div>
+        </div>
+        <div class="step-line"></div>
+        <div class="step-item">
+          <div style="display:flex;flex-direction:column;align-items:center;">
+            <div class="step-dot pending">5</div>
+          </div>
+        </div>
+      </div>
+      <div class="steps-labels">
+        <div class="step-label">OTP &amp; Role</div>
+        <div class="step-label active">Storage Details</div>
+        <div class="step-label">SLA &amp; Temp</div>
+        <div class="step-label">Pricing</div>
+        <div class="step-label">Documents</div>
+      </div>
+    </div>
+
+    <!-- Basic Information -->
+    <div class="reg-section">
+      <div class="section-header">
+        <div class="section-icon si-teal">🏢</div>
+        <div>
+          <div class="section-title">Basic Information</div>
+          <div style="font-size:11px;color:#64748B;margin-top:2px;">Company &amp; contact details</div>
+        </div>
+      </div>
+      <div class="section-body">
+        <div class="form-grid">
+          <div class="form-group">
+            <div class="form-label">Storage Name <span class="req">*</span></div>
+            <input class="form-input" type="text" placeholder="e.g. Shree Krishna Cold Storage" value="Shree Krishna Cold Storage">
+          </div>
+          <div class="form-group">
+            <div class="form-label">Company Name <span class="req">*</span></div>
+            <input class="form-input" type="text" placeholder="Registered company name" value="Shree Krishna Enterprises Pvt Ltd">
+          </div>
+          <div class="form-group">
+            <div class="form-label">GST Number <span class="req">*</span></div>
+            <input class="form-input" type="text" placeholder="22AAAAA0000A1Z5" value="22ABCDE1234F1Z3">
+          </div>
+          <div class="form-group">
+            <div class="form-label">PAN Number <span class="req">*</span></div>
+            <input class="form-input" type="text" placeholder="ABCDE1234F" value="ABCDE1234F">
+          </div>
+          <div class="form-group">
+            <div class="form-label">Contact Person <span class="req">*</span></div>
+            <input class="form-input" type="text" placeholder="Full name" value="Rajesh Sharma">
+          </div>
+          <div class="form-group">
+            <div class="form-label">Mobile Number <span class="req">*</span></div>
+            <input class="form-input" type="text" placeholder="+91 XXXXX XXXXX" value="+91 98765 43210">
+          </div>
+          <div class="form-group full">
+            <div class="form-label">Email Address <span class="req">*</span></div>
+            <input class="form-input" type="email" placeholder="your@email.com" value="rajesh@shreekrish.co.in">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Location Details -->
+    <div class="reg-section">
+      <div class="section-header">
+        <div class="section-icon si-blue">📍</div>
+        <div>
+          <div class="section-title">Location Details</div>
+          <div style="font-size:11px;color:#64748B;margin-top:2px;">Facility address &amp; service radius</div>
+        </div>
+      </div>
+      <div class="section-body">
+        <div class="form-group" style="margin-bottom:14px;">
+          <div class="form-label">Full Address <span class="req">*</span></div>
+          <div style="position:relative;">
+            <input class="form-input" type="text" placeholder="Search address on map..." value="Plot 45, Industrial Area, Pune" style="width:100%;padding-right:40px;">
+            <div style="position:absolute;right:12px;top:50%;transform:translateY(-50%);color:#0F766E;font-size:14px;">📍</div>
+          </div>
+        </div>
+        <div class="form-grid-3" style="margin-bottom:14px;">
+          <div class="form-group">
+            <div class="form-label">City</div>
+            <input class="form-input" type="text" value="Pune">
+          </div>
+          <div class="form-group">
+            <div class="form-label">State</div>
+            <select class="form-select">
+              <option>Maharashtra</option>
+              <option>Karnataka</option>
+              <option>Gujarat</option>
+              <option>Tamil Nadu</option>
+              <option>Rajasthan</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <div class="form-label">Pincode</div>
+            <input class="form-input" type="text" value="411019">
+          </div>
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <div class="form-label">Latitude</div>
+            <input class="form-input" type="text" value="18.5204" placeholder="Auto-filled from map">
+          </div>
+          <div class="form-group">
+            <div class="form-label">Longitude</div>
+            <input class="form-input" type="text" value="73.8567" placeholder="Auto-filled from map">
+          </div>
+          <div class="form-group full">
+            <div class="form-label">Service Radius (KM) <span class="req">*</span></div>
+            <input class="form-input" type="number" value="75">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Storage Capacity & Temperature -->
+    <div class="reg-section">
+      <div class="section-header">
+        <div class="section-icon si-teal">🧊</div>
+        <div>
+          <div class="section-title">Storage Capacity &amp; Temperature</div>
+          <div style="font-size:11px;color:#64748B;margin-top:2px;">Cold chain capabilities</div>
+        </div>
+      </div>
+      <div class="section-body">
+        <div class="form-grid" style="margin-bottom:14px;">
+          <div class="form-group">
+            <div class="form-label">Total Capacity <span class="req">*</span></div>
+            <input class="form-input" type="number" value="500">
+          </div>
+          <div class="form-group">
+            <div class="form-label">Unit Type</div>
+            <select class="form-select">
+              <option>MT (Metric Tonnes)</option>
+              <option>Pallets</option>
+              <option>CBM</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <div class="form-label">Number of Chambers</div>
+            <input class="form-input" type="number" value="4">
+          </div>
+          <div class="form-group">
+            <div class="form-label">Temperature Monitoring</div>
+            <select class="form-select">
+              <option>IoT (Automated)</option>
+              <option>Manual</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group" style="margin-bottom:14px;">
+          <div class="form-label">Supported Temperature Types <span class="req">*</span></div>
+          <div class="temp-pills">
+            <div class="temp-pill frozen">❄ Frozen (below -18°C)</div>
+            <div class="temp-pill chilled">🌿 Chilled (0 – 8°C)</div>
+            <div class="temp-pill ambient">☀ Ambient (8 – 25°C)</div>
+          </div>
+        </div>
+        <div class="divider"></div>
+        <div class="toggle-row" style="margin-bottom:10px;">
+          <div>
+            <div class="toggle-label">Backup Power Available</div>
+            <div class="toggle-sub">Generator / UPS availability</div>
+          </div>
+          <div class="toggle-switch" onclick="this.style.background=this.style.background==='#94A3B8'?'#22C55E':'#94A3B8';"></div>
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <div class="form-label">Backup Duration (Hours)</div>
+            <input class="form-input" type="number" value="24">
+          </div>
+          <div class="form-group">
+            <div class="form-label">Log Frequency</div>
+            <select class="form-select">
+              <option>Every 1 Hour</option>
+              <option>Every 2 Hours</option>
+              <option>Every 4 Hours</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Document Upload -->
+    <div class="reg-section">
+      <div class="section-header">
+        <div class="section-icon si-green">📎</div>
+        <div>
+          <div class="section-title">Document Upload</div>
+          <div style="font-size:11px;color:#64748B;margin-top:2px;">Required for admin verification</div>
+        </div>
+      </div>
+      <div class="section-body">
+        <div class="doc-upload-grid">
+          <div class="doc-upload">
+            <div class="doc-icon">📄</div>
+            <div><div class="doc-name">GST Certificate</div><div class="doc-sub">PDF / JPG, max 5MB</div></div>
+          </div>
+          <div class="doc-upload" style="border-color:#0F766E;background:#F0FDF9;">
+            <div class="doc-icon" style="background:#CCFBF1;">✅</div>
+            <div><div class="doc-name" style="color:#0F766E;">PAN Card</div><div class="doc-sub" style="color:#0F766E;">pan_card.pdf — Uploaded</div></div>
+          </div>
+          <div class="doc-upload">
+            <div class="doc-icon">🛡</div>
+            <div><div class="doc-name">Insurance Copy</div><div class="doc-sub">PDF / JPG, max 5MB</div></div>
+          </div>
+          <div class="doc-upload">
+            <div class="doc-icon">📋</div>
+            <div><div class="doc-name">License Documents</div><div class="doc-sub">FSSAI / ISO / Others</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="btn-row">
+      <button class="btn-back">← Back</button>
+      <button class="btn-next">Continue to SLA &amp; Temperature →</button>
+    </div>
+  </div>
+</body>
+</html>

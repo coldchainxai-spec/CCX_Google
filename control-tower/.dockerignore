@@ -1,0 +1,36 @@
+# Dependency directories
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Environment variable files and secrets (NEVER deploy or commit secrets)
+.env
+.env.*
+*.local
+*.pem
+*.key
+*.cert
+*.crt
+id_rsa*
+gcloud-credentials.json
+service-account*.json
+credentials.json
+
+# Local build and development artifacts
+.git
+.gitignore
+.dockerignore
+.gcloudignore
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+scratch/
+.system_generated/
+
+# Tests & Coverage
+coverage/
+*.test.ts
+*.spec.ts

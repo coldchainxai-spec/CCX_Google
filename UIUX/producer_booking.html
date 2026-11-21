@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ColdChainX — Instant Book & Bid Compare</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{--brand-teal:#0F766E;--brand-blue:#00329B;--brand-ice:#38BDF8;--bg:#F0F5FF;--white:#fff;--border:#E2E8F0;--text:#0F172A;--muted:#64748B;--light:#F8FAFC;--green:#16A34A;--amber:#D97706;--red:#DC2626;}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);display:flex;min-height:100vh;}
+
+.sidebar{width:220px;background:#00329B;min-height:100vh;flex-shrink:0;display:flex;flex-direction:column;}
+.sb-brand{padding:16px;border-bottom:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;gap:9px;}
+.sb-logo{width:30px;height:30px;background:rgba(255,255,255,0.15);border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.sb-name{font-family:'Sora',sans-serif;font-size:14px;font-weight:800;color:#fff;}
+.sb-name span{color:#38BDF8;}
+.sb-nav{padding:10px 8px;flex:1;}
+.nav-grp{font-size:9px;color:rgba(255,255,255,0.3);font-weight:700;letter-spacing:0.8px;text-transform:uppercase;padding:10px 8px 4px;}
+.nav-item{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;font-size:12px;color:rgba(255,255,255,0.6);cursor:pointer;transition:all .15s;text-decoration:none;border-left:2px solid transparent;margin-bottom:1px;}
+.nav-item:hover{background:rgba(255,255,255,0.07);color:#fff;}
+.nav-item.active{background:rgba(255,255,255,0.14);color:#fff;border-left-color:#38BDF8;}
+.nav-item .ni{font-size:13px;width:16px;text-align:center;flex-shrink:0;}
+.nav-badge{margin-left:auto;background:#EF4444;color:#fff;font-size:9px;font-weight:700;padding:1px 6px;border-radius:999px;}
+
+.main{flex:1;overflow:hidden;}
+.topbar{background:#fff;border-bottom:1px solid var(--border);padding:0 28px;height:56px;display:flex;align-items:center;justify-content:space-between;}
+.page-title{font-family:'Sora',sans-serif;font-size:15px;font-weight:700;color:var(--text);}
+.page-sub{font-size:11px;color:var(--muted);}
+
+/* PAGE TABS */
+.page-tabs{display:flex;gap:0;border-bottom:2px solid var(--border);background:#fff;padding:0 28px;}
+.pt{padding:14px 20px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .15s;display:flex;align-items:center;gap:7px;}
+.pt.active{color:var(--brand-blue);border-bottom-color:var(--brand-blue);}
+.pt:hover{color:var(--text);}
+
+.content{padding:24px 28px;overflow-y:auto;height:calc(100vh - 112px);}
+
+/* ===== INSTANT BOOKING ===== */
+.book-layout{display:grid;grid-template-columns:1fr 380px;gap:20px;}
+
+.card{background:#fff;border-radius:14px;border:1px solid var(--border);overflow:hidden;}
+.card-head{padding:15px 20px;border-bottom:1px solid #F8FAFC;display:flex;align-items:center;gap:10px;}
+.ch-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
+.ch-title{font-size:13px;font-weight:700;color:var(--text);}
+.ch-sub{font-size:10px;color:var(--muted);margin-top:1px;}
+.card-body{padding:18px 20px;}
+
+/* BOOKING TYPE TOGGLE */
+.book-type-toggle{display:flex;background:#F1F5F9;border-radius:10px;padding:3px;margin-bottom:18px;}
+.btt{flex:1;padding:9px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;text-align:center;transition:all .15s;color:var(--muted);border:none;background:none;font-family:'Plus Jakarta Sans',sans-serif;display:flex;align-items:center;justify-content:center;gap:7px;}
+.btt.active{background:#fff;color:var(--brand-blue);box-shadow:0 2px 8px rgba(0,0,0,0.1);}
+
+/* ROUTE BOX */
+.route-box{background:#F8FAFC;border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px;position:relative;}
+.route-input-row{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.route-input-row:last-of-type{margin-bottom:0;}
+.route-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.rd-green{background:#22C55E;}
+.rd-blue{background:#3B82F6;}
+.route-line{width:1px;height:20px;background:#CBD5E1;margin-left:4px;margin-bottom:-2px;margin-top:-2px;}
+.route-fi{flex:1;height:40px;border:1.5px solid var(--border);border-radius:9px;padding:0 12px;font-size:13px;color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;outline:none;background:#fff;}
+.route-fi:focus{border-color:var(--brand-blue);}
+.route-swap{position:absolute;right:16px;top:50%;transform:translateY(-50%);width:30px;height:30px;background:#fff;border:1px solid var(--border);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;}
+
+/* FORM */
+.fg{margin-bottom:14px;}
+.fl{display:block;font-size:11px;color:var(--muted);font-weight:600;margin-bottom:5px;letter-spacing:0.2px;}
+.fi,.fs{height:40px;border:1.5px solid var(--border);border-radius:9px;padding:0 12px;font-size:13px;color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;outline:none;transition:all .15s;background:#fff;width:100%;}
+.fi:focus,.fs:focus{border-color:var(--brand-blue);}
+.fs{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+
+/* TRUCK TYPE SELECTOR */
+.truck-types{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.truck-opt{border:2px solid var(--border);border-radius:10px;padding:10px 8px;cursor:pointer;transition:all .15s;text-align:center;}
+.truck-opt:hover{border-color:var(--brand-teal);}
+.truck-opt.selected{border-color:var(--brand-blue);background:#EFF6FF;}
+.to-icon{font-size:20px;margin-bottom:3px;}
+.to-label{font-size:11px;font-weight:700;color:var(--text);}
+.to-cap{font-size:9px;color:var(--muted);}
+
+/* TEMP PILLS */
+.temp-pills{display:flex;gap:7px;flex-wrap:wrap;}
+.tp{padding:7px 12px;border-radius:8px;border:2px solid var(--border);font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;}
+.tp.frozen{border-color:#38BDF8;background:#EFF6FF;color:#0369A1;}
+.tp.chilled{border-color:#22C55E;background:#F0FDF4;color:#15803D;}
+.tp.ambient{border-color:#FACC15;background:#FEFCE8;color:#A16207;}
+
+/* PRICE ESTIMATE */
+.price-est{background:#F0FDF9;border:1.5px solid #86EFAC;border-radius:12px;padding:16px;}
+.pe-title{font-size:11px;font-weight:700;color:var(--brand-teal);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.5px;}
+.pe-row{display:flex;justify-content:space-between;font-size:12px;padding:4px 0;border-bottom:1px solid #D1FAE5;}
+.pe-row:last-of-type{border-bottom:none;}
+.pe-label{color:var(--muted);}
+.pe-val{font-weight:600;color:var(--text);}
+.pe-total{display:flex;justify-content:space-between;padding-top:10px;border-top:2px solid #86EFAC;margin-top:8px;font-size:15px;font-weight:800;color:var(--brand-teal);}
+.ai-tag{background:#EDE9FE;border:1px solid #C4B5FD;border-radius:8px;padding:9px 12px;font-size:11px;color:#5B21B6;display:flex;gap:7px;align-items:center;margin-top:10px;}
+
+/* MATCHES */
+.match-card{border:1.5px solid var(--border);border-radius:12px;padding:14px;margin-bottom:10px;cursor:pointer;transition:all .2s;position:relative;}
+.match-card:hover{border-color:var(--brand-teal);box-shadow:0 2px 12px rgba(15,118,110,0.1);}
+.match-card.recommended{border-color:var(--brand-blue);background:#FAFBFF;}
+.rec-tag{position:absolute;top:-1px;right:12px;background:var(--brand-blue);color:#fff;font-size:9px;font-weight:700;padding:2px 9px;border-radius:0 0 6px 6px;}
+.mc-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.mc-name{font-size:13px;font-weight:700;color:var(--text);}
+.mc-price{font-family:'Sora',sans-serif;font-size:16px;font-weight:800;color:var(--brand-teal);}
+.mc-tags{display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap;}
+.mc-tag{font-size:9px;font-weight:600;padding:2px 7px;border-radius:4px;}
+.mct-blue{background:#DBEAFE;color:#1E40AF;}
+.mct-green{background:#DCFCE7;color:#15803D;}
+.mct-amber{background:#FEF3C7;color:#92400E;}
+.mc-meta{display:flex;gap:12px;font-size:11px;color:var(--muted);margin-bottom:10px;}
+.mc-bar{height:4px;background:#F1F5F9;border-radius:999px;overflow:hidden;margin-bottom:8px;}
+.mc-fill{height:100%;border-radius:999px;}
+.mc-actions{display:flex;gap:8px;}
+.mca-btn{flex:1;padding:8px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;border:none;transition:all .15s;}
+.mca-view{background:#F1F5F9;color:var(--text);}
+.mca-book{background:var(--brand-blue);color:#fff;}
+.mca-chat{background:#DCFCE7;color:var(--green);width:36px;flex:none;}
+
+/* ===== BID & COMPARE ===== */
+.bid-page{display:none;}
+.bid-layout{display:grid;grid-template-columns:320px 1fr;gap:20px;}
+.bid-filter-card{background:#fff;border-radius:14px;border:1px solid var(--border);height:fit-content;}
+
+/* RFQ LIST */
+.rfq-item{padding:14px 18px;border-bottom:1px solid #F8FAFC;cursor:pointer;transition:background .15s;}
+.rfq-item:hover,.rfq-item.selected{background:#EFF6FF;}
+.rfq-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;}
+.rfq-id{font-size:10px;color:#94A3B8;}
+.rfq-timer{font-size:10px;background:#FEF3C7;color:#92400E;padding:2px 7px;border-radius:4px;font-weight:600;}
+.rfq-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:3px;}
+.rfq-sub{font-size:11px;color:var(--muted);}
+.rfq-count{font-size:10px;font-weight:700;color:var(--brand-blue);margin-top:5px;}
+
+/* COMPARISON TABLE */
+.compare-header{padding:16px 20px;border-bottom:1px solid #F8FAFC;}
+.compare-summary{display:flex;gap:14px;padding:14px 20px;background:#F8FAFC;border-bottom:1px solid var(--border);}
+.cs-item{text-align:center;flex:1;}
+.cs-val{font-family:'Sora',sans-serif;font-size:17px;font-weight:800;color:var(--text);}
+.cs-label{font-size:10px;color:var(--muted);margin-top:2px;}
+
+.compare-table{overflow-x:auto;}
+table.ctable{width:100%;border-collapse:collapse;}
+.ctable th{background:#F8FAFC;padding:10px 14px;text-align:left;font-size:11px;font-weight:700;color:var(--muted);border-bottom:1px solid var(--border);white-space:nowrap;}
+.ctable td{padding:12px 14px;border-bottom:1px solid #F8FAFC;font-size:12px;vertical-align:middle;}
+.ctable tr:hover td{background:#FAFBFF;}
+.ctable tr.rec-row td{background:#EFF6FF;}
+.rank-badge{width:22px;height:22px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;}
+.rb-gold{background:#F59E0B;}
+.rb-silver{background:#94A3B8;}
+.rb-bronze{background:#D97706;}
+.rb-4{background:#E2E8F0;color:var(--text);}
+.vendor-name{font-weight:700;font-size:13px;color:var(--text);}
+.vendor-loc{font-size:10px;color:var(--muted);}
+.price-big{font-family:'Sora',sans-serif;font-size:15px;font-weight:800;color:var(--brand-teal);}
+.price-sub{font-size:10px;color:var(--muted);}
+.stars{color:#F59E0B;font-size:12px;}
+.sla-bar{display:flex;align-items:center;gap:6px;}
+.sla-track{width:60px;height:5px;background:#F1F5F9;border-radius:999px;overflow:hidden;}
+.sla-fill{height:100%;border-radius:999px;background:var(--green);}
+.ai-rec-tag{background:linear-gradient(135deg,#5B21B6,var(--brand-blue));color:#fff;font-size:9px;font-weight:700;padding:2px 7px;border-radius:4px;display:inline-flex;align-items:center;gap:3px;}
+.action-cell{display:flex;gap:5px;}
+.act-book{padding:7px 12px;background:var(--brand-blue);color:#fff;border:none;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:'Plus Jakarta Sans',sans-serif;}
+.act-chat{padding:7px 10px;background:#DCFCE7;color:var(--green);border:none;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;}
+.act-view{padding:7px 10px;background:#F1F5F9;color:var(--text);border:none;border-radius:7px;font-size:11px;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;}
+
+/* BUTTONS */
+.btn-primary{width:100%;height:46px;border:none;border-radius:10px;background:linear-gradient(135deg,var(--brand-blue),var(--brand-teal));font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:700;color:#fff;cursor:pointer;margin-top:12px;display:flex;align-items:center;justify-content:center;gap:7px;}
+.btn-secondary{width:100%;height:40px;border:1.5px solid var(--border);border-radius:10px;background:#fff;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;margin-top:8px;}
+.divider{height:1px;background:#F1F5F9;margin:14px 0;}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="sb-brand">
+    <div class="sb-logo"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg></div>
+    <div class="sb-name">Cold<span>Chain</span>X</div>
+  </div>
+  <div class="sb-nav">
+    <div class="nav-grp">Main</div>
+    <a class="nav-item" href="producer_dashboard.html"><span class="ni">📊</span> Dashboard</a>
+    <a class="nav-item active" href="producer_booking.html"><span class="ni">⚡</span> Instant Book</a>
+    <a class="nav-item" href="#" onclick="switchTab('bid')"><span class="ni">⚖️</span> Bid & Compare <span class="nav-badge">4</span></a>
+    <div class="nav-grp">Manage</div>
+    <a class="nav-item" href="#"><span class="ni">📦</span> My Bookings</a>
+    <a class="nav-item" href="#"><span class="ni">📍</span> Live Tracking</a>
+    <a class="nav-item" href="producer_payment.html"><span class="ni">💳</span> Payments</a>
+    <div class="nav-grp">Account</div>
+    <a class="nav-item" href="#"><span class="ni">👤</span> Profile</a>
+    <a class="nav-item" href="#"><span class="ni">🔔</span> Alerts</a>
+    <a class="nav-item" href="#"><span class="ni">🎧</span> Support</a>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div>
+      <div class="page-title" id="main-title">⚡ Instant Booking</div>
+      <div class="page-sub">Book cold storage or reefer truck instantly — no waiting</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div style="font-size:12px;color:var(--muted);">🌾 Rajan Kumar</div>
+      <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--brand-teal),var(--brand-ice));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;">RK</div>
+    </div>
+  </div>
+
+  <div class="page-tabs">
+    <div class="pt active" id="tab-booking" onclick="switchTab('booking')">⚡ Instant Book</div>
+    <div class="pt" id="tab-bid" onclick="switchTab('bid')">⚖️ Bid & Compare RFQ</div>
+  </div>
+
+  <div class="content">
+
+    <!-- INSTANT BOOKING PAGE -->
+    <div id="page-booking">
+      <div class="book-layout">
+        <!-- LEFT: FORM -->
+        <div>
+          <!-- BOOKING TYPE -->
+          <div class="card" style="margin-bottom:16px;">
+            <div class="card-body">
+              <div class="book-type-toggle">
+                <button class="btt active" onclick="setBookType(this,'reefer')">🚛 Book Reefer Truck</button>
+                <button class="btt" onclick="setBookType(this,'storage')">🏭 Book Cold Storage</button>
+              </div>
+              <!-- ROUTE -->
+              <div class="route-box">
+                <div class="route-input-row">
+                  <div class="route-dot rd-green"></div>
+                  <input class="route-fi" type="text" placeholder="📍 Pickup / Source location" value="APMC Vashi, Navi Mumbai">
+                </div>
+                <div style="display:flex;align-items:center;gap:4px;padding-left:4px;"><div class="route-line"></div></div>
+                <div class="route-input-row" style="margin-top:8px;margin-bottom:0;">
+                  <div class="route-dot rd-blue"></div>
+                  <input class="route-fi" type="text" placeholder="🏁 Destination / Drop location" value="Pimpri Cold Zone, Pune">
+                </div>
+                <div class="route-swap">⇅</div>
+              </div>
+
+              <!-- TRUCK TYPE -->
+              <div class="fg" style="margin-top:14px;">
+                <label class="fl">Select Truck Size</label>
+                <div class="truck-types">
+                  <div class="truck-opt"><div class="to-icon">🛺</div><div class="to-label">1 MT</div><div class="to-cap">Mini / Tempo</div></div>
+                  <div class="truck-opt selected"><div class="to-icon">🚐</div><div class="to-label">3 MT</div><div class="to-cap">14 FT Reefer</div></div>
+                  <div class="truck-opt"><div class="to-icon">🚛</div><div class="to-label">7 MT</div><div class="to-cap">20 FT Reefer</div></div>
+                  <div class="truck-opt"><div class="to-icon">🚚</div><div class="to-label">14 MT</div><div class="to-cap">24 FT Reefer</div></div>
+                  <div class="truck-opt"><div class="to-icon">🚢</div><div class="to-label">Container</div><div class="to-cap">32 FT / FCL</div></div>
+                  <div class="truck-opt"><div class="to-icon">🔲</div><div class="to-label">Custom</div><div class="to-cap">Specify size</div></div>
+                </div>
+              </div>
+
+              <div class="grid2">
+                <div class="fg">
+                  <label class="fl">Product Type</label>
+                  <select class="fs"><option>🍎 Fruits & Vegetables</option><option>🥛 Dairy</option><option>🥩 Meat / Seafood</option><option>🧊 Frozen Food</option><option>💊 Pharma</option></select>
+                </div>
+                <div class="fg">
+                  <label class="fl">Load Weight (MT)</label>
+                  <input class="fi" type="number" value="2.5">
+                </div>
+                <div class="fg">
+                  <label class="fl">Pickup Date</label>
+                  <input class="fi" type="date" value="2025-08-01">
+                </div>
+                <div class="fg">
+                  <label class="fl">Pickup Time</label>
+                  <input class="fi" type="time" value="06:00">
+                </div>
+              </div>
+
+              <div class="fg">
+                <label class="fl">Temperature Requirement</label>
+                <div class="temp-pills">
+                  <div class="tp chilled">🌿 Chilled (0–4°C)</div>
+                  <div class="tp frozen">❄ Frozen (-18°C)</div>
+                  <div class="tp ambient">☀ Ambient</div>
+                </div>
+              </div>
+
+              <div class="fg">
+                <label class="fl">Product Name / Description</label>
+                <input class="fi" type="text" placeholder="e.g. Alphonso Mango, Strawberry" value="Alphonso Mango — 2.5 MT crates">
+              </div>
+
+              <div class="grid2">
+                <div class="fg">
+                  <label class="fl">Delivery Type</label>
+                  <select class="fs"><option selected>One-time Trip</option><option>Daily Recurring</option><option>Weekly Contract</option></select>
+                </div>
+                <div class="fg">
+                  <label class="fl">Door-to-Door?</label>
+                  <select class="fs"><option selected>Yes — Door to Door</option><option>No — Depot Pickup</option></select>
+                </div>
+              </div>
+
+              <div class="fg">
+                <label class="fl">Special Instructions</label>
+                <input class="fi" type="text" placeholder="e.g. Handle with care, fragile, no stacking">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT: MATCHES + ESTIMATE -->
+        <div>
+          <!-- PRICE ESTIMATE -->
+          <div class="card" style="margin-bottom:16px;">
+            <div class="card-head">
+              <div class="ch-icon" style="background:#DCFCE7;">💰</div>
+              <div><div class="ch-title">Estimated Cost</div><div class="ch-sub">Auto-calculated from your inputs</div></div>
+            </div>
+            <div class="card-body">
+              <div class="price-est">
+                <div class="pe-title">Price Breakdown</div>
+                <div class="pe-row"><span class="pe-label">Base fare (3 MT · 85 km)</span><span class="pe-val">₹7,225</span></div>
+                <div class="pe-row"><span class="pe-label">Reefer surcharge</span><span class="pe-val">₹1,500</span></div>
+                <div class="pe-row"><span class="pe-label">Loading/Unloading</span><span class="pe-val">₹800</span></div>
+                <div class="pe-row"><span class="pe-label">Platform fee (3%)</span><span class="pe-val">₹286</span></div>
+                <div class="pe-row"><span class="pe-label">GST (18%)</span><span class="pe-val">₹1,714</span></div>
+                <div class="pe-total"><span>Total Payable</span><span>₹11,525</span></div>
+              </div>
+              <div class="ai-tag">🤖 <span><strong>AI Insight:</strong> This route has 6 trucks available. Best price window is 6–8 AM departure.</span></div>
+            </div>
+          </div>
+
+          <!-- NEARBY MATCHES -->
+          <div class="card">
+            <div class="card-head">
+              <div class="ch-icon" style="background:#DBEAFE;">🚛</div>
+              <div><div class="ch-title">6 Trucks Available Now</div><div class="ch-sub">Near Navi Mumbai · Sorted by rating</div></div>
+            </div>
+            <div style="padding:14px;">
+              <div class="match-card recommended">
+                <div class="rec-tag">🤖 AI Recommended</div>
+                <div class="mc-top"><div><div class="mc-name">Kiran Reefer Transport</div><div style="font-size:10px;color:var(--muted);">📍 3 km · 14 FT Reefer · Amit (Driver)</div></div><div class="mc-price">₹88/km</div></div>
+                <div class="mc-tags">
+                  <span class="mc-tag mct-green">✅ Verified</span>
+                  <span class="mc-tag mct-blue">⭐ 4.9 · 312 trips</span>
+                  <span class="mc-tag mct-amber">🌡 Temp: 3.1°C</span>
+                </div>
+                <div class="mc-bar"><div class="mc-fill" style="width:96%;background:var(--green);"></div></div>
+                <div class="mc-actions">
+                  <button class="mca-btn mca-view">👁 View</button>
+                  <button class="mca-btn mca-chat">💬</button>
+                  <button class="mca-btn mca-book" onclick="window.location='producer_payment.html'">Book Now →</button>
+                </div>
+              </div>
+              <div class="match-card">
+                <div class="mc-top"><div><div class="mc-name">Sharma Cold Logistics</div><div style="font-size:10px;color:var(--muted);">📍 8 km · 14 FT Reefer · Rajesh (Driver)</div></div><div class="mc-price">₹82/km</div></div>
+                <div class="mc-tags">
+                  <span class="mc-tag mct-green">✅ Verified</span>
+                  <span class="mc-tag mct-blue">⭐ 4.7 · 186 trips</span>
+                </div>
+                <div class="mc-actions">
+                  <button class="mca-btn mca-view">👁 View</button>
+                  <button class="mca-btn mca-chat">💬</button>
+                  <button class="mca-btn mca-book" onclick="window.location='producer_payment.html'">Book Now →</button>
+                </div>
+              </div>
+              <div class="match-card">
+                <div class="mc-top"><div><div class="mc-name">Mahesh Transport Co.</div><div style="font-size:10px;color:var(--muted);">📍 15 km · 20 FT Reefer · Suresh (Driver)</div></div><div class="mc-price">₹78/km</div></div>
+                <div class="mc-tags">
+                  <span class="mc-tag mct-blue">⭐ 4.5 · 94 trips</span>
+                  <span class="mc-tag" style="background:#FEE2E2;color:#991B1B;">⚠ 1 issue reported</span>
+                </div>
+                <div class="mc-actions">
+                  <button class="mca-btn mca-view">👁 View</button>
+                  <button class="mca-btn mca-chat">💬</button>
+                  <button class="mca-btn mca-book">Book Now →</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BID & COMPARE PAGE -->
+    <div id="page-bid" style="display:none;">
+      <div class="bid-layout">
+        <!-- RFQ LIST -->
+        <div>
+          <div class="card">
+            <div class="card-head">
+              <div class="ch-icon" style="background:#EDE9FE;">⚖️</div>
+              <div><div class="ch-title">My RFQs / Bid Requests</div><div class="ch-sub">4 active · 12 bids received</div></div>
+            </div>
+            <div>
+              <div class="rfq-item selected">
+                <div class="rfq-top"><div class="rfq-id">RFQ-0041</div><div class="rfq-timer">⏱ 2h 14m</div></div>
+                <div class="rfq-title">Cold Storage — Frozen Mango 80 MT</div>
+                <div class="rfq-sub">Navi Mumbai area · 30 days · Frozen</div>
+                <div class="rfq-count">🔥 4 bids received · AI ranked</div>
+              </div>
+              <div class="rfq-item">
+                <div class="rfq-top"><div class="rfq-id">RFQ-0039</div><div class="rfq-timer">⏱ 5h 30m</div></div>
+                <div class="rfq-title">Reefer Transport — APMC → Pune</div>
+                <div class="rfq-sub">2.5 MT · 14 FT reefer · One-time</div>
+                <div class="rfq-count">🔥 7 bids received</div>
+              </div>
+              <div class="rfq-item">
+                <div class="rfq-top"><div class="rfq-id">RFQ-0038</div><div class="rfq-timer">⏱ 12h left</div></div>
+                <div class="rfq-title">Cold Storage — Chilled Dairy 45 MT</div>
+                <div class="rfq-sub">Pune area · 7 days · Chilled</div>
+                <div class="rfq-count">📋 3 bids received</div>
+              </div>
+              <div class="rfq-item">
+                <div class="rfq-top"><div class="rfq-id">RFQ-0035</div><div class="rfq-timer">Expired</div></div>
+                <div class="rfq-title">Reefer — Mumbai → Nashik</div>
+                <div class="rfq-sub">5 MT · Weekly recurring</div>
+                <div class="rfq-count" style="color:var(--red);">✓ Booked — BK-2036</div>
+              </div>
+            </div>
+            <div style="padding:14px 16px;">
+              <button class="btn-primary" style="margin-top:0;" onclick="switchTab('booking')">+ Raise New RFQ</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- COMPARE TABLE -->
+        <div class="card">
+          <div class="compare-header">
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+              <div>
+                <div style="font-size:14px;font-weight:700;color:var(--text);">RFQ-0041 · Cold Storage Bids</div>
+                <div style="font-size:11px;color:var(--muted);margin-top:2px;">Frozen Mango · 80 MT · 30 days · Navi Mumbai area</div>
+              </div>
+              <div style="display:flex;gap:8px;">
+                <select class="fs" style="width:auto;padding:6px 28px 6px 10px;height:34px;font-size:11px;">
+                  <option>Sort: AI Recommended</option>
+                  <option>Sort: Lowest Price</option>
+                  <option>Sort: Nearest</option>
+                  <option>Sort: Best Rating</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="compare-summary">
+            <div class="cs-item"><div class="cs-val">4</div><div class="cs-label">Total Bids</div></div>
+            <div class="cs-item"><div class="cs-val">₹380</div><div class="cs-label">Lowest /MT/day</div></div>
+            <div class="cs-item"><div class="cs-val">48 km</div><div class="cs-label">Nearest Storage</div></div>
+            <div class="cs-item"><div class="cs-val">4.8 ⭐</div><div class="cs-label">Best Rating</div></div>
+            <div class="cs-item"><div class="cs-val">98%</div><div class="cs-label">Best SLA</div></div>
+          </div>
+          <div class="compare-table">
+            <table class="ctable">
+              <thead>
+                <tr>
+                  <th>Rank</th>
+                  <th>Storage Partner</th>
+                  <th>Price /MT/day</th>
+                  <th>Capacity</th>
+                  <th>Distance</th>
+                  <th>Rating</th>
+                  <th>SLA %</th>
+                  <th>Tag</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="rec-row">
+                  <td><span class="rank-badge rb-gold">1</span></td>
+                  <td><div class="vendor-name">Shree Krishna Cold Storage</div><div class="vendor-loc">📍 Navi Mumbai · Verified ✅</div></td>
+                  <td><div class="price-big">₹420</div><div class="price-sub">₹10,08,000 total</div></td>
+                  <td>150 MT avail</td>
+                  <td>12 km</td>
+                  <td><span class="stars">★★★★★</span><br><span style="font-size:10px;color:var(--muted);">4.9 (148)</span></td>
+                  <td><div class="sla-bar"><div class="sla-track"><div class="sla-fill" style="width:98%;"></div></div><span style="font-size:11px;font-weight:600;">98%</span></div></td>
+                  <td><span class="ai-rec-tag">🤖 AI Pick</span></td>
+                  <td><div class="action-cell"><button class="act-view">View</button><button class="act-chat">💬</button><button class="act-book" onclick="window.location='producer_payment.html'">Book</button></div></td>
+                </tr>
+                <tr>
+                  <td><span class="rank-badge rb-silver">2</span></td>
+                  <td><div class="vendor-name">Nashik Agri Cold Stores</div><div class="vendor-loc">📍 Nashik · Verified ✅</div></td>
+                  <td><div class="price-big" style="color:var(--green);">₹380</div><div class="price-sub">₹9,12,000 total</div></td>
+                  <td>320 MT avail</td>
+                  <td>48 km</td>
+                  <td><span class="stars">★★★★☆</span><br><span style="font-size:10px;color:var(--muted);">4.7 (212)</span></td>
+                  <td><div class="sla-bar"><div class="sla-track"><div class="sla-fill" style="width:94%;"></div></div><span style="font-size:11px;font-weight:600;">94%</span></div></td>
+                  <td><span style="background:#DCFCE7;color:#15803D;font-size:9px;font-weight:700;padding:2px 7px;border-radius:4px;">💰 Best Price</span></td>
+                  <td><div class="action-cell"><button class="act-view">View</button><button class="act-chat">💬</button><button class="act-book">Book</button></div></td>
+                </tr>
+                <tr>
+                  <td><span class="rank-badge rb-bronze">3</span></td>
+                  <td><div class="vendor-name">Pune ColdHub Facility</div><div class="vendor-loc">📍 Pune · Verified ✅</div></td>
+                  <td><div class="price-big">₹450</div><div class="price-sub">₹10,80,000 total</div></td>
+                  <td>80 MT avail</td>
+                  <td>65 km</td>
+                  <td><span class="stars">★★★★★</span><br><span style="font-size:10px;color:var(--muted);">4.8 (334)</span></td>
+                  <td><div class="sla-bar"><div class="sla-track"><div class="sla-fill" style="width:96%;"></div></div><span style="font-size:11px;font-weight:600;">96%</span></div></td>
+                  <td><span style="background:#DBEAFE;color:#1E40AF;font-size:9px;font-weight:700;padding:2px 7px;border-radius:4px;">🏆 Best SLA</span></td>
+                  <td><div class="action-cell"><button class="act-view">View</button><button class="act-chat">💬</button><button class="act-book">Book</button></div></td>
+                </tr>
+                <tr>
+                  <td><span class="rank-badge rb-4">4</span></td>
+                  <td><div class="vendor-name">Western Agri Stores</div><div class="vendor-loc">📍 Satara · Pending verification</div></td>
+                  <td><div class="price-big" style="color:var(--muted);">₹395</div><div class="price-sub">₹9,48,000 total</div></td>
+                  <td>200 MT avail</td>
+                  <td>92 km</td>
+                  <td><span class="stars" style="color:#CBD5E1;">★★★★☆</span><br><span style="font-size:10px;color:var(--muted);">4.4 (56)</span></td>
+                  <td><div class="sla-bar"><div class="sla-track"><div class="sla-fill" style="width:88%;background:var(--amber);"></div></div><span style="font-size:11px;font-weight:600;color:var(--amber);">88%</span></div></td>
+                  <td><span style="background:#FEF3C7;color:#92400E;font-size:9px;font-weight:700;padding:2px 7px;border-radius:4px;">⚠ Unverified</span></td>
+                  <td><div class="action-cell"><button class="act-view">View</button><button class="act-chat">💬</button><button class="act-book" style="opacity:.5;cursor:not-allowed;">Book</button></div></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div style="padding:14px 20px;background:#F8FAFC;border-top:1px solid var(--border);">
+            <div class="ai-tag" style="margin-top:0;">🤖 <span><strong>AI Recommendation:</strong> Shree Krishna Cold Storage offers the best balance of price, proximity (12 km), and SLA compliance (98%). Nashik Agri is cheapest but 48 km away — adding ~₹6,000 in transport costs.</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+function switchTab(tab) {
+  document.getElementById('page-booking').style.display = tab==='booking' ? 'block' : 'none';
+  document.getElementById('page-bid').style.display = tab==='bid' ? 'block' : 'none';
+  document.getElementById('tab-booking').className = 'pt' + (tab==='booking' ? ' active' : '');
+  document.getElementById('tab-bid').className = 'pt' + (tab==='bid' ? ' active' : '');
+  document.getElementById('main-title').textContent = tab==='booking' ? '⚡ Instant Booking' : '⚖️ Bid & Compare';
+}
+function setBookType(btn, type) {
+  document.querySelectorAll('.btt').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+document.querySelectorAll('.truck-opt').forEach(el => {
+  el.addEventListener('click', () => { document.querySelectorAll('.truck-opt').forEach(e => e.classList.remove('selected')); el.classList.add('selected'); });
+});
+</script>
+</body>
+</html>
